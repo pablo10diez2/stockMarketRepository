@@ -11,5 +11,6 @@
 #include "sqlite3.h"
 
 bool iniciarSesion(const std::string& email, const std::string& password);
+bool registrarUsuario(const std::string& nombre, const std::string& apellido, const std::string& email, const std::string& password, int id_rol);
 
 #endif /* FUNCIONESBD_H_ */

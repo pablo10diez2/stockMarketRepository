@@ -4,7 +4,8 @@
 #include <string>
 #include "funcionesBD.h"
 #include "sqlite3.h"
-
+#include "Usuario.h"
+#include "logs.h"
 
 #define SERVER_IP "127.0.0.1"
 #define SERVER_PORT 6000
@@ -105,6 +106,8 @@ int main() {
 
                 if (loginSuccess) {
                     send(comm_socket, "Login exitoso.\n", 15, 0);
+                    escribirLog("Usuario " + email + " ha iniciado sesión.");
+
                 } else {
                     send(comm_socket, "Email o contraseña incorrectos.\n", 32, 0);
                 }
@@ -147,6 +150,10 @@ int main() {
 
                 // Registrar en la base de datos
                 bool registroSuccess = registrarUsuario(nombre, apellido, email, password, id_rol);
+                escribirLog("Nuevo usuario registrado: " + email);
+
+                Usuario usuario(nombre, apellido, email, password, id_rol, 0);
+
 
                 if (registroSuccess) {
                     send(comm_socket, "Registro completado exitosamente.\n", 34, 0);

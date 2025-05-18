@@ -15,7 +15,7 @@ bool iniciarSesion(const std::string& email, const std::string& password) {
         return false;
     }
 
-    const char* sql = "SELECT * FROM Usuario WHERE Email = ? AND Contraseña = ?";
+    const char* sql = "SELECT * FROM Usuario WHERE Email = ? AND Contrasena = ?";
 
     rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
     if (rc != SQLITE_OK) {
@@ -77,7 +77,7 @@ bool registrarUsuario(const std::string& nombre, const std::string& apellido,
     sqlite3_finalize(stmt);
 
     // Registrar el nuevo usuario
-    const char* sqlInsert = "INSERT INTO Usuario (Nombre_Usuario, Apellido_Usuario, Email, Contraseña, ID_Rol, Dinero) "
+    const char* sqlInsert = "INSERT INTO Usuario (Nombre_Usuario, Apellido_Usuario, Email, Contrasena, ID_Rol, Dinero) "
                           "VALUES (?, ?, ?, ?, ?, 0)";
 
     rc = sqlite3_prepare_v2(db, sqlInsert, -1, &stmt, nullptr);

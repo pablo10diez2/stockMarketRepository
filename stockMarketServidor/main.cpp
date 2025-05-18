@@ -5,11 +5,17 @@
 #include "funcionesBD.h"
 #include "MenuCuenta.h"
 #include "sqlite3.h"
-
+#include "Usuario.h"
+#include "logs.h"
 #define SERVER_IP "127.0.0.1"
 #define SERVER_PORT 6000
 
+
 void mostrarMenuPrincipal(SOCKET comm_socket, const std::string& email_usuario) {
+
+// Devuelve true si el usuario quiere cerrar la conexión (Salir)
+bool mostrarMenuPrincipal(SOCKET comm_socket) {
+
     char recvBuff[512];
     int bytes;
     bool sesionActiva = true;
@@ -37,14 +43,16 @@ void mostrarMenuPrincipal(SOCKET comm_socket, const std::string& email_usuario) 
             MenuCuenta menuCuenta(comm_socket, email_usuario);
             menuCuenta.mostrarMenu();
         } else if (subOption == "4") {
-            std::string msg = "Saliendo del menú principal...\n";
+            std::string msg = "Adiós. Gracias por usar nuestro servicio.\n";
             send(comm_socket, msg.c_str(), msg.size(), 0);
-            sesionActiva = false;
+            return true;  // Salir completamente (como la opción 3 del menú inicial)
         } else {
             std::string msg = "Opción inválida. Intente de nuevo.\n";
             send(comm_socket, msg.c_str(), msg.size(), 0);
         }
     }
+
+    return false;
 }
 
 int main() {
@@ -132,7 +140,15 @@ int main() {
 
                 if (loginSuccess) {
                     send(comm_socket, "Login exitoso.\n", 15, 0);
+
                     mostrarMenuPrincipal(comm_socket, email);
+
+                    escribirLog("Usuario " + email + " ha iniciado sesión.");
+                    if (mostrarMenuPrincipal(comm_socket)) {
+                        clienteActivo = false;
+                    }
+
+
                 } else {
                     send(comm_socket, "Email o contraseña incorrectos.\n", 32, 0);
                 }
@@ -169,10 +185,20 @@ int main() {
                 std::cout << "Registro de nuevo usuario: " << nombre << " " << apellido << " / " << email << "\n";
 
                 bool registroSuccess = registrarUsuario(nombre, apellido, email, password, id_rol);
+                escribirLog("Nuevo usuario registrado: " + email);
+
+                Usuario usuario(nombre, apellido, email, password, id_rol, 0);
+
 
                 if (registroSuccess) {
                     send(comm_socket, "Registro completado exitosamente.\n", 34, 0);
+
                     mostrarMenuPrincipal(comm_socket, email);
+
+                    if (mostrarMenuPrincipal(comm_socket)) {
+                        clienteActivo = false;
+                    }
+
                 } else {
                     send(comm_socket, "Error al registrar. Posiblemente el email ya existe.\n", 53, 0);
                 }

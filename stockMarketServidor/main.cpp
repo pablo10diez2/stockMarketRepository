@@ -3,12 +3,13 @@
 #include <ws2tcpip.h>
 #include <string>
 #include "funcionesBD.h"
+#include "MenuCuenta.h"
 #include "sqlite3.h"
 
 #define SERVER_IP "127.0.0.1"
 #define SERVER_PORT 6000
 
-void mostrarMenuPrincipal(SOCKET comm_socket) {
+void mostrarMenuPrincipal(SOCKET comm_socket, const std::string& email_usuario) {
     char recvBuff[512];
     int bytes;
     bool sesionActiva = true;
@@ -29,8 +30,12 @@ void mostrarMenuPrincipal(SOCKET comm_socket) {
             std::string msg = "Opción seleccionada: Orden\n";
             send(comm_socket, msg.c_str(), msg.size(), 0);
         } else if (subOption == "3") {
-            std::string msg = "Opción seleccionada: Cuenta\n";
+            std::string msg = "Accediendo a gestión de cuenta...\n";
             send(comm_socket, msg.c_str(), msg.size(), 0);
+
+            // Usar la nueva clase MenuCuenta
+            MenuCuenta menuCuenta(comm_socket, email_usuario);
+            menuCuenta.mostrarMenu();
         } else if (subOption == "4") {
             std::string msg = "Saliendo del menú principal...\n";
             send(comm_socket, msg.c_str(), msg.size(), 0);
@@ -127,7 +132,7 @@ int main() {
 
                 if (loginSuccess) {
                     send(comm_socket, "Login exitoso.\n", 15, 0);
-                    mostrarMenuPrincipal(comm_socket);
+                    mostrarMenuPrincipal(comm_socket, email);
                 } else {
                     send(comm_socket, "Email o contraseña incorrectos.\n", 32, 0);
                 }
@@ -167,7 +172,7 @@ int main() {
 
                 if (registroSuccess) {
                     send(comm_socket, "Registro completado exitosamente.\n", 34, 0);
-                    mostrarMenuPrincipal(comm_socket);
+                    mostrarMenuPrincipal(comm_socket, email);
                 } else {
                     send(comm_socket, "Error al registrar. Posiblemente el email ya existe.\n", 53, 0);
                 }

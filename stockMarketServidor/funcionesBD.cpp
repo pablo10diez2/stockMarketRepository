@@ -1,6 +1,8 @@
 #include <iostream>
 #include <string>
 #include "funcionesBD.h"
+#include "sqlite3.h"
+
 
 bool iniciarSesion(const std::string& email, const std::string& password) {
     sqlite3* db;

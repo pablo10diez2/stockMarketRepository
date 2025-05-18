@@ -3,6 +3,8 @@
 #include <ws2tcpip.h>
 #include <string>
 #include "funcionesBD.h"
+#include "sqlite3.h"
+
 
 #define SERVER_IP "127.0.0.1"
 #define SERVER_PORT 6000

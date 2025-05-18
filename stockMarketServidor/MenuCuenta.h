@@ -16,7 +16,9 @@ private:
 
 public:
     MenuCuenta(SOCKET socket, const std::string& email);
-    void mostrarMenu();
+
+    // Devuelve true si el usuario eligió salir completamente
+    bool mostrarMenu();
 };
 
 #endif /* MENUCUENTA_H_ */

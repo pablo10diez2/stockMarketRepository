@@ -10,12 +10,59 @@
 #define SERVER_IP "127.0.0.1"
 #define SERVER_PORT 6000
 
+// Declaración de funciones
+bool mostrarMenuPrincipal(SOCKET comm_socket, Usuario usuario);
+Usuario cargarUsuarioDesdeBD(const std::string& email);
 
-void mostrarMenuPrincipal(SOCKET comm_socket, const std::string& email_usuario) {
+// Función para cargar los datos completos del usuario desde la BD
+Usuario cargarUsuarioDesdeBD(const std::string& email) {
+    sqlite3* db;
+    sqlite3_stmt* stmt;
+    int rc;
+
+    Usuario usuario; // Crear un usuario vacío por defecto
+
+    rc = sqlite3_open("JP.sqlite", &db);
+    if (rc) {
+        std::cerr << "No se pudo abrir la base de datos: " << sqlite3_errmsg(db) << '\n';
+        return usuario;
+    }
+
+    const char* sql = "SELECT Nombre_Usuario, Apellido_Usuario, Email, Contrasena, ID_Rol, Dinero "
+                      "FROM Usuario WHERE Email = ?";
+
+    rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
+    if (rc != SQLITE_OK) {
+        std::cerr << "Fallo al preparar la consulta: " << sqlite3_errmsg(db) << '\n';
+        sqlite3_close(db);
+        return usuario;
+    }
+
+    sqlite3_bind_text(stmt, 1, email.c_str(), -1, SQLITE_STATIC);
+    rc = sqlite3_step(stmt);
+
+    if (rc == SQLITE_ROW) {
+        std::string nombre = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
+        std::string apellido = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
+        std::string dbEmail = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 2));
+        std::string password = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 3));
+        int id_rol = sqlite3_column_int(stmt, 4);
+        double dinero = sqlite3_column_double(stmt, 5);
+
+        // Crear un nuevo objeto Usuario con todos los datos
+        usuario = Usuario(nombre, apellido, dbEmail, password, id_rol, dinero);
+        std::cout << "Usuario cargado: " << nombre << " " << apellido << " (Email: " << dbEmail << ")\n";
+    } else {
+        std::cerr << "No se encontró al usuario con email: " << email << "\n";
+    }
+
+    sqlite3_finalize(stmt);
+    sqlite3_close(db);
+    return usuario;
 }
-// Devuelve true si el usuario quiere cerrar la conexión (Salir)
-bool mostrarMenuPrincipal(SOCKET comm_socket) {
 
+// Función para mostrar el menú principal
+bool mostrarMenuPrincipal(SOCKET comm_socket, Usuario usuario) {
     char recvBuff[512];
     int bytes;
     bool sesionActiva = true;
@@ -25,7 +72,10 @@ bool mostrarMenuPrincipal(SOCKET comm_socket) {
         send(comm_socket, subMenu.c_str(), subMenu.size(), 0);
 
         bytes = recv(comm_socket, recvBuff, sizeof(recvBuff) - 1, 0);
-        if (bytes <= 0) break;
+        if (bytes <= 0) {
+            escribirLog("Conexión perdida en menú principal con usuario: " + usuario.getEmail());
+            return false;
+        }
         recvBuff[bytes] = '\0';
         std::string subOption(recvBuff);
 
@@ -39,12 +89,16 @@ bool mostrarMenuPrincipal(SOCKET comm_socket) {
             std::string msg = "Accediendo a gestión de cuenta...\n";
             send(comm_socket, msg.c_str(), msg.size(), 0);
 
-            // Usar la nueva clase MenuCuenta
-            MenuCuenta menuCuenta(comm_socket, email_usuario);
-            menuCuenta.mostrarMenu();
+            // Usar la nueva clase MenuCuenta con el email del usuario
+            MenuCuenta menuCuenta(comm_socket, usuario.getEmail());
+            if (menuCuenta.mostrarMenu()) {
+                // Si el usuario eligió salir completamente
+                return true;
+            }
         } else if (subOption == "4") {
             std::string msg = "Adiós. Gracias por usar nuestro servicio.\n";
             send(comm_socket, msg.c_str(), msg.size(), 0);
+            escribirLog("Usuario " + usuario.getEmail() + " cerró sesión");
             return true;  // Salir completamente (como la opción 3 del menú inicial)
         } else {
             std::string msg = "Opción inválida. Intente de nuevo.\n";
@@ -67,9 +121,13 @@ int main() {
         return -1;
     }
 
+    // Registro de inicio del servidor
+    escribirLog("Servidor iniciado en " + std::string(SERVER_IP) + ":" + std::to_string(SERVER_PORT));
+
     conn_socket = socket(AF_INET, SOCK_STREAM, 0);
     if (conn_socket == INVALID_SOCKET) {
         std::cerr << "Socket creation failed. Error: " << WSAGetLastError() << '\n';
+        escribirLog("Error al crear el socket: " + std::to_string(WSAGetLastError()));
         WSACleanup();
         return -1;
     }
@@ -103,6 +161,7 @@ int main() {
 
         std::cout << "Client connected: " << inet_ntoa(client.sin_addr)
                   << ":" << ntohs(client.sin_port) << "\n";
+        escribirLog("Nueva conexión desde: " + std::string(inet_ntoa(client.sin_addr)) + ":" + std::to_string(ntohs(client.sin_port)));
 
         bool clienteActivo = true;
 
@@ -113,6 +172,7 @@ int main() {
             int bytes = recv(comm_socket, recvBuff, sizeof(recvBuff) - 1, 0);
             if (bytes <= 0) {
                 std::cerr << "Client disconnected unexpectedly.\n";
+                escribirLog("Cliente desconectado inesperadamente en el menú principal");
                 break;
             }
 
@@ -121,36 +181,58 @@ int main() {
 
             if (option == "1") {
                 std::cout << "Client selected login.\n";
+                escribirLog("Cliente seleccionó iniciar sesión");
 
                 send(comm_socket, "Enter email: ", 15, 0);
                 bytes = recv(comm_socket, recvBuff, sizeof(recvBuff) - 1, 0);
-                if (bytes <= 0) break;
+                if (bytes <= 0) {
+                    escribirLog("Cliente desconectado durante el inicio de sesión");
+                    break;
+                }
                 recvBuff[bytes] = '\0';
                 std::string email(recvBuff);
 
                 send(comm_socket, "Enter password: ", 17, 0);
                 bytes = recv(comm_socket, recvBuff, sizeof(recvBuff) - 1, 0);
-                if (bytes <= 0) break;
+                if (bytes <= 0) {
+                    escribirLog("Cliente desconectado durante el inicio de sesión");
+                    break;
+                }
                 recvBuff[bytes] = '\0';
                 std::string password(recvBuff);
 
                 std::cout << "Login attempt: " << email << "\n";
 
-                bool loginSuccess = iniciarSesion(email, password);
+                try {
+                    bool loginSuccess = iniciarSesion(email, password);
 
-                if (loginSuccess) {
-                    send(comm_socket, "Login exitoso.\n", 15, 0);
+                    if (loginSuccess) {
+                        send(comm_socket, "Login exitoso.\n", 15, 0);
+                        escribirLog("Inicio de sesión exitoso para el usuario: " + email);
 
-                    mostrarMenuPrincipal(comm_socket, email);
+                        // Cargar los datos completos del usuario desde la BD
+                        Usuario usuario = cargarUsuarioDesdeBD(email);
+                        if (usuario.getEmail().empty()) {
+                            escribirLog("Error al cargar datos de usuario: " + email);
+                            send(comm_socket, "Error al cargar datos de usuario.\n", 33, 0);
+                            continue;
+                        }
 
-                    escribirLog("Usuario " + email + " ha iniciado sesión.");
-                    if (mostrarMenuPrincipal(comm_socket)) {
-                        clienteActivo = false;
+                        escribirLog("Usuario " + email + " ha iniciado sesión.");
+
+                        // Mostrar el menú principal con el objeto Usuario completo
+                        if (mostrarMenuPrincipal(comm_socket, usuario)) {
+                            clienteActivo = false;
+                        }
+                    } else {
+                        send(comm_socket, "Email o contraseña incorrectos.\n", 32, 0);
+                        escribirLog("Intento fallido de inicio de sesión para: " + email);
                     }
-
-
-                } else {
-                    send(comm_socket, "Email o contraseña incorrectos.\n", 32, 0);
+                } catch (const std::exception& e) {
+                    std::string errorMsg = "Error en inicio de sesión: ";
+                    errorMsg += e.what();
+                    escribirLog(errorMsg);
+                    send(comm_socket, "Error en el servidor. Intente nuevamente.\n", 42, 0);
                 }
 
             } else if (option == "2") {
@@ -185,27 +267,27 @@ int main() {
                 std::cout << "Registro de nuevo usuario: " << nombre << " " << apellido << " / " << email << "\n";
 
                 bool registroSuccess = registrarUsuario(nombre, apellido, email, password, id_rol);
-                escribirLog("Nuevo usuario registrado: " + email);
-
-                Usuario usuario(nombre, apellido, email, password, id_rol, 0);
-
 
                 if (registroSuccess) {
+                    escribirLog("Nuevo usuario registrado: " + email);
                     send(comm_socket, "Registro completado exitosamente.\n", 34, 0);
 
-                    mostrarMenuPrincipal(comm_socket, email);
+                    // Crear el objeto usuario directamente ya que tenemos todos los datos
+                    Usuario usuario(nombre, apellido, email, password, id_rol, 0);
 
-                    if (mostrarMenuPrincipal(comm_socket)) {
+                    // Mostrar el menú principal con el objeto Usuario completo
+                    if (mostrarMenuPrincipal(comm_socket, usuario)) {
                         clienteActivo = false;
                     }
-
                 } else {
                     send(comm_socket, "Error al registrar. Posiblemente el email ya existe.\n", 53, 0);
+                    escribirLog("Intento fallido de registro para email: " + email);
                 }
 
             } else if (option == "3") {
                 std::cout << "Client chose to exit.\n";
                 send(comm_socket, "Adiós. Gracias por usar nuestro servicio.\n", 42, 0);
+                escribirLog("Cliente eligió salir desde el menú principal");
                 clienteActivo = false;
             } else {
                 std::cout << "Opción inválida recibida: " << option << "\n";
@@ -221,4 +303,3 @@ int main() {
     WSACleanup();
     return 0;
 }
-

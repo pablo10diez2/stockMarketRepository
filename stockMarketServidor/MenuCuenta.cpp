@@ -1,5 +1,6 @@
 #include "MenuCuenta.h"
 #include "sqlite3.h"
+#include "logs.h"
 #include <iostream>
 #include <string>
 #include <winsock2.h>
@@ -7,17 +8,22 @@
 MenuCuenta::MenuCuenta(SOCKET socket, const std::string& email) : comm_socket(socket), email_usuario(email) {
 }
 
-void MenuCuenta::mostrarMenu() {
+bool MenuCuenta::mostrarMenu() {
     char recvBuff[512];
     int bytes;
     bool menuActivo = true;
+    bool salirCompleto = false;
 
     while (menuActivo) {
         std::string menuOpciones = "\n=== MENU CUENTA ===\n1) Ver perfil\n2) Cambiar contrasena\n3) Introducir fondos\n4) Volver\n5) Salir\nSeleccione una opción: ";
         send(comm_socket, menuOpciones.c_str(), menuOpciones.size(), 0);
 
         bytes = recv(comm_socket, recvBuff, sizeof(recvBuff) - 1, 0);
-        if (bytes <= 0) break;
+        if (bytes <= 0) {
+            escribirLog("Error de comunicación en MenuCuenta para usuario: " + email_usuario);
+            return false; // Indica que hubo un problema de conexión
+        }
+
         recvBuff[bytes] = '\0';
         std::string opcion(recvBuff);
 
@@ -34,14 +40,15 @@ void MenuCuenta::mostrarMenu() {
         } else if (opcion == "5") {
             std::string msg = "Saliendo del sistema. ¡Hasta pronto!\n";
             send(comm_socket, msg.c_str(), msg.size(), 0);
-            // Salir completamente
-            closesocket(comm_socket);
-            exit(0);
+            menuActivo = false;
+            salirCompleto = true;
         } else {
             std::string msg = "Opción inválida. Intente de nuevo.\n";
             send(comm_socket, msg.c_str(), msg.size(), 0);
         }
     }
+
+    return salirCompleto; // Indica si el usuario quiere salir completamente
 }
 
 void MenuCuenta::verPerfil() {
@@ -57,7 +64,7 @@ void MenuCuenta::verPerfil() {
     }
 
     const char* sql = "SELECT Nombre_Usuario, Apellido_Usuario, Email, ID_Rol, Dinero "
-                      "FROM Usuario WHERE Email = ?";
+                    "FROM Usuario WHERE Email = ?";
 
     rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
     if (rc != SQLITE_OK) {
@@ -87,6 +94,7 @@ void MenuCuenta::verPerfil() {
         perfil += "Dinero disponible: " + std::to_string(dinero) + " €\n";
 
         send(comm_socket, perfil.c_str(), perfil.size(), 0);
+        escribirLog("Usuario " + email_usuario + " consultó su perfil");
     } else {
         std::string errorMsg = "No se encontró información del usuario.\n";
         send(comm_socket, errorMsg.c_str(), errorMsg.size(), 0);
@@ -137,6 +145,7 @@ void MenuCuenta::cambiarContrasena() {
     if (rc == SQLITE_DONE) {
         std::string exito = "Contraseña actualizada correctamente.\n";
         send(comm_socket, exito.c_str(), exito.size(), 0);
+        escribirLog("Usuario " + email_usuario + " cambió su contraseña");
     } else {
         std::string errorMsg = "Error al actualizar la contraseña.\n";
         send(comm_socket, errorMsg.c_str(), errorMsg.size(), 0);
@@ -236,9 +245,10 @@ void MenuCuenta::introducirFondos() {
 
     if (rc == SQLITE_DONE) {
         std::string confirmacion = "Se han añadido " + std::to_string(cantidad) +
-                                  " € a tu cuenta.\nNuevo saldo: " +
-                                  std::to_string(nuevoSaldo) + " €\n";
+                                " € a tu cuenta.\nNuevo saldo: " +
+                                std::to_string(nuevoSaldo) + " €\n";
         send(comm_socket, confirmacion.c_str(), confirmacion.size(), 0);
+        escribirLog("Usuario " + email_usuario + " añadió " + std::to_string(cantidad) + " € a su cuenta");
     } else {
         std::string errorMsg = "Error al actualizar el saldo.\n";
         send(comm_socket, errorMsg.c_str(), errorMsg.size(), 0);

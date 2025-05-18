@@ -1,5 +1,15 @@
 #include "Usuario.h"
 
+// Constructor vacío: inicializa todos los atributos con valores predeterminados
+Usuario::Usuario() {
+	this->nombre = "";
+	this->apellido = "";
+	this->email = "";
+	this->contrasena = "";
+	this->idRol = 0;
+	this->dinero = 0.0;
+}
+
 Usuario::Usuario(const std::string& nombre, const std::string& apellido, const std::string& email,
 			const std::string& contrasena, int idRol, double dinero) {
 	this->nombre = nombre;

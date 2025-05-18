@@ -1,11 +1,17 @@
+#include "logs.h"
 #include <fstream>
 #include <string>
 #include <ctime>
 #include <iomanip>
+#include <iostream>
 
 void escribirLog(const std::string& mensaje) {
+    // Asegurar que el directorio data existe
     std::ofstream archivoLog("data/logs.txt", std::ios::app);
-    if (!archivoLog.is_open()) return;
+    if (!archivoLog.is_open()) {
+        std::cerr << "No se pudo abrir el archivo de logs" << std::endl;
+        return;
+    }
 
     std::time_t ahora = std::time(nullptr);
     std::tm* tiempoLocal = std::localtime(&ahora);

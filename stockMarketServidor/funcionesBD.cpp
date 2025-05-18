@@ -9,7 +9,7 @@ bool iniciarSesion(const std::string& email, const std::string& password) {
     sqlite3_stmt* stmt;
     int rc;
 
-    rc = sqlite3_open("JP.sqlite", &db);
+    rc = sqlite3_open("stockMarketServidor/JP.sqlite", &db);
     if (rc) {
         std::cerr << "No se pudo abrir la base de datos: " << sqlite3_errmsg(db) << '\n';
         return false;
@@ -49,7 +49,7 @@ bool registrarUsuario(const std::string& nombre, const std::string& apellido,
     sqlite3_stmt* stmt;
     int rc;
 
-    rc = sqlite3_open("JP.sqlite", &db);
+    rc = sqlite3_open("stockMarketServidor/JP.sqlite", &db);
     if (rc) {
         std::cerr << "No se pudo abrir la base de datos: " << sqlite3_errmsg(db) << '\n';
         return false;

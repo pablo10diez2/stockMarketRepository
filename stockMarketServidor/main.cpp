@@ -12,7 +12,7 @@
 
 
 void mostrarMenuPrincipal(SOCKET comm_socket, const std::string& email_usuario) {
-
+}
 // Devuelve true si el usuario quiere cerrar la conexión (Salir)
 bool mostrarMenuPrincipal(SOCKET comm_socket) {
 
@@ -221,3 +221,4 @@ int main() {
     WSACleanup();
     return 0;
 }
+

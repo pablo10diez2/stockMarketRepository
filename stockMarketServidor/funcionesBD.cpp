@@ -3,7 +3,6 @@
 #include "funcionesBD.h"
 #include "sqlite3.h"
 
-
 bool iniciarSesion(const std::string& email, const std::string& password) {
     sqlite3* db;
     sqlite3_stmt* stmt;
@@ -108,3 +107,48 @@ bool registrarUsuario(const std::string& nombre, const std::string& apellido,
     return registroCorrecto;
 }
 
+Usuario cargarUsuarioDesdeBD(const std::string& email) {
+    sqlite3* db;
+    sqlite3_stmt* stmt;
+    int rc;
+
+    Usuario usuario; // Crear un usuario vacío por defecto
+
+    rc = sqlite3_open("JP.sqlite", &db);
+    if (rc) {
+        std::cerr << "No se pudo abrir la base de datos: " << sqlite3_errmsg(db) << '\n';
+        return usuario;
+    }
+
+    const char* sql = "SELECT Nombre_Usuario, Apellido_Usuario, Email, Contrasena, ID_Rol, Dinero "
+                      "FROM Usuario WHERE Email = ?";
+
+    rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
+    if (rc != SQLITE_OK) {
+        std::cerr << "Fallo al preparar la consulta: " << sqlite3_errmsg(db) << '\n';
+        sqlite3_close(db);
+        return usuario;
+    }
+
+    sqlite3_bind_text(stmt, 1, email.c_str(), -1, SQLITE_STATIC);
+    rc = sqlite3_step(stmt);
+
+    if (rc == SQLITE_ROW) {
+        std::string nombre = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
+        std::string apellido = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
+        std::string dbEmail = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 2));
+        std::string password = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 3));
+        int id_rol = sqlite3_column_int(stmt, 4);
+        double dinero = sqlite3_column_double(stmt, 5);
+
+        // Crear un nuevo objeto Usuario con todos los datos
+        usuario = Usuario(nombre, apellido, dbEmail, password, id_rol, dinero);
+        std::cout << "Usuario cargado: " << nombre << " " << apellido << " (Email: " << dbEmail << ")\n";
+    } else {
+        std::cerr << "No se encontró al usuario con email: " << email << "\n";
+    }
+
+    sqlite3_finalize(stmt);
+    sqlite3_close(db);
+    return usuario;
+}

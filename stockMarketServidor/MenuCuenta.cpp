@@ -5,6 +5,8 @@
 #include <string>
 #include <winsock2.h>
 
+MenuCuenta::MenuCuenta(SOCKET socket, const std::string& email) : comm_socket(socket), email_usuario(email) {
+}
 
 bool MenuCuenta::mostrarMenu() {
     char recvBuff[512];
@@ -18,8 +20,11 @@ bool MenuCuenta::mostrarMenu() {
 
         bytes = recv(comm_socket, recvBuff, sizeof(recvBuff) - 1, 0);
 
+
         recvBuff[bytes] = '\0';
         std::string opcion(recvBuff);
+        opcion = opcion.substr(0, opcion.find_first_of("\r\n"));
+
 
         if (opcion == "1") {
             verPerfil();

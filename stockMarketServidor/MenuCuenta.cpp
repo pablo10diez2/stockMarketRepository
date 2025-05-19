@@ -19,10 +19,6 @@ bool MenuCuenta::mostrarMenu() {
         send(comm_socket, menuOpciones.c_str(), menuOpciones.size(), 0);
 
         bytes = recv(comm_socket, recvBuff, sizeof(recvBuff) - 1, 0);
-        if (bytes <= 0) {
-            escribirLog("Error de comunicación en MenuCuenta para usuario: " + email_usuario);
-            return false;
-        }
 
         recvBuff[bytes] = '\0';
         std::string opcion(recvBuff);

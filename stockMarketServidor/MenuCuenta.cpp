@@ -5,8 +5,6 @@
 #include <string>
 #include <winsock2.h>
 
-MenuCuenta::MenuCuenta(SOCKET socket, const std::string& email) : comm_socket(socket), email_usuario(email) {
-}
 
 bool MenuCuenta::mostrarMenu() {
     char recvBuff[512];

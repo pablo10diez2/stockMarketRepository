@@ -1,6 +1,5 @@
 #include "Usuario.h"
 
-// Constructor vacío: inicializa todos los atributos con valores predeterminados
 Usuario::Usuario() {
 	this->nombre = "";
 	this->apellido = "";

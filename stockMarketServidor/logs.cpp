@@ -6,7 +6,6 @@
 #include <iostream>
 
 void escribirLog(const std::string& mensaje) {
-    // Asegurar que el directorio data existe
     std::ofstream archivoLog("data/logs.txt", std::ios::app);
     if (!archivoLog.is_open()) {
         std::cerr << "No se pudo abrir el archivo de logs" << std::endl;

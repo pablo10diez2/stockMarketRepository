@@ -21,7 +21,7 @@ bool MenuCuenta::mostrarMenu() {
         bytes = recv(comm_socket, recvBuff, sizeof(recvBuff) - 1, 0);
         if (bytes <= 0) {
             escribirLog("Error de comunicación en MenuCuenta para usuario: " + email_usuario);
-            return false; // Indica que hubo un problema de conexión
+            return false;
         }
 
         recvBuff[bytes] = '\0';
@@ -48,7 +48,7 @@ bool MenuCuenta::mostrarMenu() {
         }
     }
 
-    return salirCompleto; // Indica si el usuario quiere salir completamente
+    return salirCompleto;
 }
 
 void MenuCuenta::verPerfil() {

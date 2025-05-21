@@ -108,7 +108,8 @@ int main() {
                     bool loginSuccess = iniciarSesion(email, password);
 
                     if (loginSuccess) {
-                        send(comm_socket, "Login exitoso.\n", 15, 0);
+                        std::string successMsg = "Inicio de sesión exitoso. Bienvenido!\n";
+                        send(comm_socket, successMsg.c_str(), successMsg.size(), 0);
                         escribirLog("Inicio de sesión exitoso para el usuario: " + email);
 
                         // Cargar los datos completos del usuario desde la BD
@@ -119,7 +120,12 @@ int main() {
                             continue;
                         }
 
+                        std::cout << "Usuario cargado: " << usuario.getNombre() << " "
+                                  << usuario.getApellido() << " (Email: " << usuario.getEmail() << ")\n";
                         escribirLog("Usuario " + email + " ha iniciado sesión.");
+
+                        // Pequeña pausa para asegurar que el mensaje de bienvenida se recibe
+                        Sleep(100);
 
                         if (mostrarMenuPrincipal(comm_socket, usuario)) {
                             clienteActivo = false;
@@ -170,9 +176,13 @@ int main() {
 
                 if (registroSuccess) {
                     escribirLog("Nuevo usuario registrado: " + email);
-                    send(comm_socket, "Registro completado exitosamente.\n", 34, 0);
+                    std::string successMsg = "Registro completado exitosamente. ¡Bienvenido!\n";
+                    send(comm_socket, successMsg.c_str(), successMsg.size(), 0);
 
                     Usuario usuario(nombre, apellido, email, password, id_rol, 0);
+
+                    // Pequeña pausa para asegurar que el mensaje de bienvenida se recibe
+                    Sleep(100);
 
                     if (mostrarMenuPrincipal(comm_socket, usuario)) {
                         clienteActivo = false;

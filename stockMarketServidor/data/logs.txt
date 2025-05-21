@@ -1,0 +1,79 @@
+[2025-05-20 08:35:19] Servidor iniciado en 127.0.0.1:6000
+[2025-05-20 08:35:24] Nueva conexión desde: 127.0.0.1:49191
+[2025-05-20 08:35:25] Cliente seleccionó iniciar sesión
+[2025-05-20 08:35:31] Inicio de sesión exitoso para el usuario: admin@gmail.com
+[2025-05-20 08:35:31] Usuario admin@gmail.com ha iniciado sesión.
+[2025-05-20 08:35:31] Usuario admin@gmail.com accedió al menú principal
+[2025-05-20 08:37:37] Conexión perdida en menú principal con usuario: admin@gmail.com
+[2025-05-20 08:37:37] Cliente desconectado inesperadamente en el menú principal
+[2025-05-20 08:37:44] Servidor iniciado en 127.0.0.1:6000
+[2025-05-20 08:42:25] Servidor iniciado en 127.0.0.1:6000
+[2025-05-20 08:42:30] Nueva conexión desde: 127.0.0.1:50283
+[2025-05-20 08:42:43] Servidor iniciado en 127.0.0.1:6000
+[2025-05-20 08:44:00] Servidor iniciado en 127.0.0.1:6000
+[2025-05-20 08:44:06] Nueva conexión desde: 127.0.0.1:50319
+[2025-05-20 08:44:09] Cliente seleccionó iniciar sesión
+[2025-05-20 08:44:16] Inicio de sesión exitoso para el usuario: admin@gmail.com
+[2025-05-20 08:44:16] Usuario admin@gmail.com ha iniciado sesión.
+[2025-05-20 08:44:16] Usuario admin@gmail.com accedió al menú principal
+[2025-05-20 08:49:55] Servidor iniciado en 127.0.0.1:6000
+[2025-05-20 08:49:58] Nueva conexión desde: 127.0.0.1:50647
+[2025-05-20 08:50:44] Cliente desconectado inesperadamente en el menú principal
+[2025-05-20 08:50:50] Servidor iniciado en 127.0.0.1:6000
+[2025-05-20 09:03:51] Servidor iniciado en 127.0.0.1:6000
+[2025-05-20 09:03:55] Nueva conexión desde: 127.0.0.1:51129
+[2025-05-20 09:03:59] Cliente seleccionó iniciar sesión
+[2025-05-20 09:04:05] Inicio de sesión exitoso para el usuario: admin@gmail.com
+[2025-05-20 09:04:05] Usuario admin@gmail.com ha iniciado sesión.
+[2025-05-20 09:04:05] Usuario admin@gmail.com accedió al menú principal
+[2025-05-20 09:17:26] Servidor iniciado en 127.0.0.1:6000
+[2025-05-20 09:17:30] Nueva conexión desde: 127.0.0.1:51597
+[2025-05-20 09:17:43] Cliente seleccionó iniciar sesión
+[2025-05-20 09:17:49] Intento fallido de inicio de sesión para: 2
+[2025-05-20 09:17:53] Cliente seleccionó iniciar sesión
+[2025-05-20 09:19:26] Servidor iniciado en 127.0.0.1:6000
+[2025-05-20 09:19:28] Nueva conexión desde: 127.0.0.1:51695
+[2025-05-20 09:19:30] Cliente seleccionó iniciar sesión
+[2025-05-20 09:19:39] Inicio de sesión exitoso para el usuario: admin@gmail.com
+[2025-05-20 09:19:39] Usuario admin@gmail.com ha iniciado sesión.
+[2025-05-20 09:19:39] Usuario admin@gmail.com accedió al menú principal
+[2025-05-20 09:30:08] Servidor iniciado en 127.0.0.1:6000
+[2025-05-20 09:30:10] Nueva conexión desde: 127.0.0.1:55920
+[2025-05-20 09:30:12] Cliente seleccionó iniciar sesión
+[2025-05-20 09:30:18] Inicio de sesión exitoso para el usuario: admin@gmail.com
+[2025-05-20 09:30:18] Usuario admin@gmail.com ha iniciado sesión.
+[2025-05-20 09:30:18] Usuario admin@gmail.com accedió al menú principal
+[2025-05-21 08:31:14] Servidor iniciado en 127.0.0.1:6000
+[2025-05-21 08:31:17] Nueva conexión desde: 127.0.0.1:50050
+[2025-05-21 08:31:19] Cliente seleccionó iniciar sesión
+[2025-05-21 08:31:26] Inicio de sesión exitoso para el usuario: admin@gmail.com
+[2025-05-21 08:31:26] Usuario admin@gmail.com ha iniciado sesión.
+[2025-05-21 08:31:26] Usuario admin@gmail.com accedió al menú principal
+[2025-05-21 08:35:12] Servidor iniciado en 127.0.0.1:6000
+[2025-05-21 08:43:51] Servidor iniciado en 127.0.0.1:6000
+[2025-05-21 08:43:53] Nueva conexión desde: 127.0.0.1:50516
+[2025-05-21 08:43:56] Cliente seleccionó iniciar sesión
+[2025-05-21 08:44:08] Inicio de sesión exitoso para el usuario: admin@gmail.com
+[2025-05-21 08:44:08] Usuario admin@gmail.com ha iniciado sesión.
+[2025-05-21 08:44:08] Usuario admin@gmail.com accedió al menú principal
+[2025-05-21 08:44:45] Usuario admin@gmail.com accedió al menú de cuenta
+[2025-05-21 09:05:04] Servidor iniciado en 127.0.0.1:6000
+[2025-05-21 09:05:06] Nueva conexión desde: 127.0.0.1:52460
+[2025-05-21 09:05:07] Cliente seleccionó iniciar sesión
+[2025-05-21 09:05:13] Inicio de sesión exitoso para el usuario: admin@gmail.com
+[2025-05-21 09:05:13] Usuario admin@gmail.com ha iniciado sesión.
+[2025-05-21 09:05:13] Usuario admin@gmail.com accedió al menú principal
+[2025-05-21 09:05:25] Usuario admin@gmail.com accedió al menú de cuenta
+[2025-05-21 09:05:41] Usuario admin@gmail.com consultó su perfil
+[2025-05-21 09:17:34] Servidor iniciado en 127.0.0.1:6000
+[2025-05-21 09:17:36] Nueva conexión desde: 127.0.0.1:52847
+[2025-05-21 09:17:38] Cliente seleccionó iniciar sesión
+[2025-05-21 09:17:44] Inicio de sesión exitoso para el usuario: admin@gmail.com
+[2025-05-21 09:17:44] Usuario admin@gmail.com ha iniciado sesión.
+[2025-05-21 09:17:44] Usuario admin@gmail.com accedió al menú principal
+[2025-05-21 09:17:59] Usuario admin@gmail.com accedió al menú de cuenta
+[2025-05-21 09:18:05] Usuario admin@gmail.com consultó su perfil
+[2025-05-21 09:18:22] Usuario admin@gmail.com accedió al menú de cuenta
+[2025-05-21 09:18:42] Usuario admin@gmail.com añadió 3.000000 € a su cuenta
+[2025-05-21 09:19:10] Usuario admin@gmail.com cambió su contraseña
+[2025-05-21 09:19:28] Servidor iniciado en 127.0.0.1:6000

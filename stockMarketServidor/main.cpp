@@ -78,7 +78,7 @@ int main() {
             }
 
             recvBuff[bytes] = '\0';
-            std::string option(recvBuff);
+            std::string option = limpiarInput(recvBuff);
 
             if (option == "1") {
                 std::cout << "Client selected login.\n";
@@ -91,7 +91,7 @@ int main() {
                     break;
                 }
                 recvBuff[bytes] = '\0';
-                std::string email(recvBuff);
+                std::string email = limpiarInput(recvBuff);
 
                 send(comm_socket, "Enter password: ", 17, 0);
                 bytes = recv(comm_socket, recvBuff, sizeof(recvBuff) - 1, 0);
@@ -100,7 +100,7 @@ int main() {
                     break;
                 }
                 recvBuff[bytes] = '\0';
-                std::string password(recvBuff);
+                std::string password = limpiarInput(recvBuff);
 
                 std::cout << "Login attempt: " << email << "\n";
 

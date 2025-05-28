@@ -77,3 +77,9 @@
 [2025-05-21 09:18:42] Usuario admin@gmail.com añadió 3.000000 € a su cuenta
 [2025-05-21 09:19:10] Usuario admin@gmail.com cambió su contraseña
 [2025-05-21 09:19:28] Servidor iniciado en 127.0.0.1:6000
+[2025-05-28 16:44:51] Servidor iniciado en 127.0.0.1:6000
+[2025-05-28 16:45:03] Nueva conexión desde: 127.0.0.1:52304
+[2025-05-28 16:45:09] Cliente seleccionó iniciar sesión
+[2025-05-28 16:45:13] Inicio de sesión exitoso para el usuario: pablo
+[2025-05-28 16:45:13] Usuario pablo ha iniciado sesión.
+[2025-05-28 16:45:13] Usuario pablo accedió al menú principal

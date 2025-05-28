@@ -3,6 +3,15 @@
 #include "funcionesBD.h"
 #include "sqlite3.h"
 
+
+std::string limpiarInput(const std::string& input) {
+    std::string limpio = input;
+    while (!limpio.empty() && (limpio.back() == '\n' || limpio.back() == '\r'))
+        limpio.pop_back();
+    return limpio;
+}
+
+
 bool iniciarSesion(const std::string& email, const std::string& password) {
     sqlite3* db;
     sqlite3_stmt* stmt;

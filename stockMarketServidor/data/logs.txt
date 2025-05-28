@@ -83,3 +83,47 @@
 [2025-05-28 16:45:13] Inicio de sesión exitoso para el usuario: pablo
 [2025-05-28 16:45:13] Usuario pablo ha iniciado sesión.
 [2025-05-28 16:45:13] Usuario pablo accedió al menú principal
+[2025-05-28 17:09:19] Servidor iniciado en 127.0.0.1:6000
+[2025-05-28 17:09:26] Nueva conexión desde: 127.0.0.1:52564
+[2025-05-28 17:09:28] Cliente seleccionó iniciar sesión
+[2025-05-28 17:09:31] Inicio de sesión exitoso para el usuario: pablo
+[2025-05-28 17:09:31] Usuario pablo ha iniciado sesión.
+[2025-05-28 17:09:31] Usuario pablo accedió al menú principal
+[2025-05-28 17:18:45] Servidor iniciado en 127.0.0.1:6000
+[2025-05-28 17:18:51] Nueva conexión desde: 127.0.0.1:52874
+[2025-05-28 17:18:52] Cliente seleccionó iniciar sesión
+[2025-05-28 17:18:55] Inicio de sesión exitoso para el usuario: pablo
+[2025-05-28 17:18:55] Usuario pablo ha iniciado sesión.
+[2025-05-28 17:18:55] Usuario pablo accedió al menú principal
+[2025-05-28 17:19:15] Usuario pablo accedió al menú de cuenta
+[2025-05-28 17:20:27] Servidor iniciado en 127.0.0.1:6000
+[2025-05-28 17:20:29] Nueva conexión desde: 127.0.0.1:52886
+[2025-05-28 17:20:32] Cliente seleccionó iniciar sesión
+[2025-05-28 17:20:34] Inicio de sesión exitoso para el usuario: pablo
+[2025-05-28 17:20:34] Usuario pablo ha iniciado sesión.
+[2025-05-28 17:20:34] Usuario pablo accedió al menú principal
+[2025-05-28 17:20:39] Usuario pablo accedió al menú de cuenta
+[2025-05-28 17:23:03] Servidor iniciado en 127.0.0.1:6000
+[2025-05-28 17:23:05] Nueva conexión desde: 127.0.0.1:52914
+[2025-05-28 17:23:06] Cliente seleccionó iniciar sesión
+[2025-05-28 17:23:09] Inicio de sesión exitoso para el usuario: pablo
+[2025-05-28 17:23:09] Usuario pablo ha iniciado sesión.
+[2025-05-28 17:23:09] Usuario pablo accedió al menú principal
+[2025-05-28 17:23:16] Usuario pablo cerró sesión
+[2025-05-28 17:24:52] Servidor iniciado en 127.0.0.1:6000
+[2025-05-28 17:24:54] Nueva conexión desde: 127.0.0.1:52917
+[2025-05-28 17:24:55] Cliente seleccionó iniciar sesión
+[2025-05-28 17:24:58] Inicio de sesión exitoso para el usuario: pablo
+[2025-05-28 17:24:58] Usuario pablo ha iniciado sesión.
+[2025-05-28 17:24:58] Usuario pablo accedió al menú principal
+[2025-05-28 17:25:08] Usuario pablo accedió al menú de cuenta
+[2025-05-28 17:25:11] Usuario pablo consultó su perfil
+[2025-05-28 17:27:11] Servidor iniciado en 127.0.0.1:6000
+[2025-05-28 17:27:16] Nueva conexión desde: 127.0.0.1:52938
+[2025-05-28 17:27:19] Cliente seleccionó iniciar sesión
+[2025-05-28 17:27:22] Inicio de sesión exitoso para el usuario: pablo
+[2025-05-28 17:27:22] Usuario pablo ha iniciado sesión.
+[2025-05-28 17:27:22] Usuario pablo accedió al menú principal
+[2025-05-28 17:27:26] Usuario pablo accedió al menú de cuenta
+[2025-05-28 17:27:28] Usuario pablo consultó su perfil
+[2025-05-28 17:27:30] Usuario pablo consultó su perfil

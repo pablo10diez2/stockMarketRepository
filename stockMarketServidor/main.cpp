@@ -124,9 +124,6 @@ int main() {
                                   << usuario.getApellido() << " (Email: " << usuario.getEmail() << ")\n";
                         escribirLog("Usuario " + email + " ha iniciado sesión.");
 
-                        // Pequeña pausa para asegurar que el mensaje de bienvenida se recibe
-                        Sleep(100);
-
                         if (mostrarMenuPrincipal(comm_socket, usuario)) {
                             clienteActivo = false;
                         }
@@ -180,9 +177,6 @@ int main() {
                     send(comm_socket, successMsg.c_str(), successMsg.size(), 0);
 
                     Usuario usuario(nombre, apellido, email, password, id_rol, 0);
-
-                    // Pequeña pausa para asegurar que el mensaje de bienvenida se recibe
-                    Sleep(100);
 
                     if (mostrarMenuPrincipal(comm_socket, usuario)) {
                         clienteActivo = false;

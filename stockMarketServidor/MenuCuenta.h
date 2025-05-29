@@ -12,10 +12,10 @@ private:
     void verPerfil();
     void cambiarContrasena();
     void introducirFondos();
+    void mostrarAccionesUsuario();
 
 public:
     MenuCuenta(SOCKET socket, const std::string& email);
-
     bool mostrarMenu();
 };
 

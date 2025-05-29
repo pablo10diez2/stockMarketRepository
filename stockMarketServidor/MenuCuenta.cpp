@@ -25,7 +25,7 @@ bool MenuCuenta::mostrarMenu() {
     }
 
     while (menuActivo) {
-        std::string menuOpciones = "\n=== MENU CUENTA ===\n1) Ver perfil\n2) Cambiar contrasena\n3) Introducir fondos\n4) Volver\n5) Salir\nSeleccione una opción: ";
+    	std::string menuOpciones = "\n=== MENU CUENTA ===\n1) Ver perfil\n2) Cambiar contrasena\n3) Introducir fondos\n4) Ver acciones\n5) Volver\n6) Salir\nSeleccione una opción: ";
 
         // Display menu on server console as well
         std::cout << "\nMostrando al cliente el menú de cuenta:\n" << menuOpciones << std::endl;
@@ -83,16 +83,22 @@ bool MenuCuenta::mostrarMenu() {
             Sleep(100); // Asegurar que el mensaje llegue
 
             introducirFondos();
+        }else if (opcion == "4") {
+            std::cout << "Usuario seleccionó: Ver acciones" << std::endl;
+            std::string msg = "Opción seleccionada: Ver acciones\n";
+            send(comm_socket, msg.c_str(), msg.size(), 0);
+            Sleep(100);
+            mostrarAccionesUsuario();
 
             // No necesitamos volver a mostrar el menú aquí, ya que el bucle while se encargará de eso
-        } else if (opcion == "4") {
+        } else if (opcion == "5") {
             std::cout << "Usuario seleccionó: Volver al menú principal" << std::endl;
             std::string msg = "Volviendo al menú principal...\n";
             std::cout << "Enviando: " << msg;
             send(comm_socket, msg.c_str(), msg.size(), 0);
             Sleep(100); // Asegurar que el mensaje llegue
             menuActivo = false;
-        } else if (opcion == "5") {
+        } else if (opcion == "6") {
             std::cout << "Usuario seleccionó: Salir del sistema" << std::endl;
             std::string msg = "Saliendo del sistema. ¡Hasta pronto!\n";
             std::cout << "Enviando: " << msg;
@@ -395,3 +401,57 @@ void MenuCuenta::introducirFondos() {
     sqlite3_finalize(stmt);
     sqlite3_close(db);
 }
+
+void MenuCuenta::mostrarAccionesUsuario() {
+    std::cout << "Ejecutando mostrarAccionesUsuario() para: " << email_usuario << std::endl;
+    sqlite3* db;
+    sqlite3_stmt* stmt;
+    int rc;
+
+    rc = sqlite3_open("JP.sqlite", &db);
+    if (rc) {
+        std::string errorMsg = "Error al abrir la base de datos.\n";
+        std::cout << errorMsg;
+        send(comm_socket, errorMsg.c_str(), errorMsg.size(), 0);
+        return;
+    }
+
+    const char* sql = R"(
+        SELECT Ticker, 
+               SUM(CASE WHEN TipoOrden = 'Compra' THEN Cantidad ELSE -Cantidad END) AS Acciones
+        FROM Orden
+        WHERE Email = ? AND Estado = 1
+        GROUP BY Ticker
+        HAVING Acciones > 0;
+    )";
+
+    rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
+    if (rc != SQLITE_OK) {
+        std::string errorMsg = "Error al preparar la consulta.\n";
+        std::cout << errorMsg << " SQLite: " << sqlite3_errmsg(db) << std::endl;
+        send(comm_socket, errorMsg.c_str(), errorMsg.size(), 0);
+        sqlite3_close(db);
+        return;
+    }
+
+    sqlite3_bind_text(stmt, 1, email_usuario.c_str(), -1, SQLITE_STATIC);
+
+    std::string resumen = "\n=== ACCIONES EN POSESIÓN ===\n";
+    bool tieneAcciones = false;
+
+    while ((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
+        const char* ticker = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
+        double cantidad = sqlite3_column_double(stmt, 1);
+        resumen += "Ticker: " + std::string(ticker) + " | Cantidad: " + std::to_string(cantidad) + "\n";
+        tieneAcciones = true;
+    }
+
+    if (!tieneAcciones) {
+        resumen += "No tienes acciones en posesión.\n";
+    }
+
+    send(comm_socket, resumen.c_str(), resumen.size(), 0);
+    sqlite3_finalize(stmt);
+    sqlite3_close(db);
+}
+

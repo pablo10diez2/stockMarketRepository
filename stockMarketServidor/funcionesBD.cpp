@@ -3,12 +3,19 @@
 #include "funcionesBD.h"
 #include "sqlite3.h"
 
+#include <cctype>
 
 std::string limpiarInput(const std::string& input) {
-    std::string limpio = input;
-    while (!limpio.empty() && (limpio.back() == '\n' || limpio.back() == '\r'))
-        limpio.pop_back();
-    return limpio;
+    size_t start = 0, end = input.size();
+
+    while (start < end && (std::isspace((unsigned char)input[start]) || input[start] == '\r' || input[start] == '\n')) {
+        ++start;
+    }
+    while (end > start && (std::isspace((unsigned char)input[end - 1]) || input[end - 1] == '\r' || input[end - 1] == '\n')) {
+        --end;
+    }
+
+    return input.substr(start, end - start);
 }
 
 

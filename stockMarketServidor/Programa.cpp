@@ -10,6 +10,7 @@
 #include "menuConsulta.h"
 #include "logs.h"
 #include "Usuario.h"
+#include "MenuOrden.h"
 
 bool mostrarMenuPrincipal(SOCKET comm_socket, Usuario usuario) {
     char recvBuff[512];
@@ -67,6 +68,21 @@ bool mostrarMenuPrincipal(SOCKET comm_socket, Usuario usuario) {
             std::string msg = "Opción seleccionada: Orden\n";
             std::cout << "Enviando: " << msg;
             send(comm_socket, msg.c_str(), msg.size(), 0);
+
+            Sleep(100);
+
+            try {
+                MenuOrden menuOrden(comm_socket, usuario);
+                bool salirCompleto = menuOrden.mostrarMenu();
+                if (salirCompleto) {
+                    std::cout << "Usuario eligió salir completamente desde el menú de órdenes" << std::endl;
+                    return true;
+                }
+            } catch (const std::exception& e) {
+                std::cout << "Excepción en MenuOrden: " << e.what() << std::endl;
+                std::string errorMsg = "Error en el menú de órdenes: " + std::string(e.what()) + "\n";
+                send(comm_socket, errorMsg.c_str(), errorMsg.size(), 0);
+            }
         } else if (subOption == "3") {
             std::cout << "Usuario seleccionó opción 3: Cuenta" << std::endl;
             std::string msg = "Accediendo a gestión de cuenta...\n";

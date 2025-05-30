@@ -23,6 +23,86 @@ std::string obtenerFechaActual() {
     return "";
 }
 
+void MenuOrden::cancelarOrdenPendiente() {
+    sqlite3* db;
+    sqlite3_stmt* stmt;
+    int rc = sqlite3_open("JP.sqlite", &db);
+    if (rc) {
+        send(comm_socket, "Error al conectar con la base de datos.\n", 41, 0);
+        return;
+    }
+
+    std::string consulta = "SELECT ID_Orden, TipoOrden, Ticker, Cantidad, Precio, Fecha_Creacion "
+                           "FROM Orden WHERE Email = ? AND Estado = 0";
+    rc = sqlite3_prepare_v2(db, consulta.c_str(), -1, &stmt, nullptr);
+    if (rc != SQLITE_OK) {
+        send(comm_socket, "Error al preparar la consulta.\n", 32, 0);
+        sqlite3_close(db);
+        return;
+    }
+
+    sqlite3_bind_text(stmt, 1, usuario.getEmail().c_str(), -1, SQLITE_STATIC);
+    std::string resultado = "\n--- Órdenes Pendientes ---\n";
+    std::vector<int> idsDisponibles;
+    while (sqlite3_step(stmt) == SQLITE_ROW) {
+        int id = sqlite3_column_int(stmt, 0);
+        std::string tipo = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
+        std::string ticker = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 2));
+        int cantidad = sqlite3_column_int(stmt, 3);
+        double precio = sqlite3_column_double(stmt, 4);
+        std::string fecha = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 5));
+
+        resultado += "ID: " + std::to_string(id) + ", Tipo: " + tipo + ", Ticker: " + ticker +
+                     ", Cantidad: " + std::to_string(cantidad) + ", Precio: " + std::to_string(precio) +
+                     ", Fecha: " + fecha + "\n";
+        idsDisponibles.push_back(id);
+    }
+
+    sqlite3_finalize(stmt);
+
+    if (idsDisponibles.empty()) {
+        resultado += "No hay órdenes pendientes.\n";
+        send(comm_socket, resultado.c_str(), resultado.size(), 0);
+        sqlite3_close(db);
+        return;
+    }
+
+    send(comm_socket, resultado.c_str(), resultado.size(), 0);
+    send(comm_socket, "\nIngrese el ID de la orden a cancelar: ", 39, 0);
+
+    char buffer[256];
+    int bytes = recv(comm_socket, buffer, sizeof(buffer) - 1, 0);
+    if (bytes <= 0) {
+        sqlite3_close(db);
+        return;
+    }
+    buffer[bytes] = '\0';
+    int idIngresado = std::stoi(buffer);
+
+    if (std::find(idsDisponibles.begin(), idsDisponibles.end(), idIngresado) == idsDisponibles.end()) {
+        send(comm_socket, "ID no válido o no corresponde a una orden pendiente.\n", 54, 0);
+        sqlite3_close(db);
+        return;
+    }
+
+    std::string deleteSQL = "DELETE FROM Orden WHERE ID_Orden = ?";
+    rc = sqlite3_prepare_v2(db, deleteSQL.c_str(), -1, &stmt, nullptr);
+    if (rc == SQLITE_OK) {
+        sqlite3_bind_int(stmt, 1, idIngresado);
+        if (sqlite3_step(stmt) == SQLITE_DONE) {
+            send(comm_socket, "Orden cancelada exitosamente.\n", 31, 0);
+        } else {
+            send(comm_socket, "Error al cancelar la orden.\n", 29, 0);
+        }
+        sqlite3_finalize(stmt);
+    } else {
+        send(comm_socket, "Error al preparar eliminación.\n", 31, 0);
+    }
+
+    sqlite3_close(db);
+}
+
+
 void MenuOrden::mostrarOrdenesAnteriores() {
     sqlite3* db;
     sqlite3_stmt* stmt;
@@ -56,7 +136,7 @@ void MenuOrden::mostrarOrdenesAnteriores() {
                 resumen += "\n";
             }
             if (!hayOrdenes) {
-                resumen += "No se encontraron órdenes para este usuario.\n";
+                resumen += "No se encontraron ordenes para este usuario.\n";
             }
             sqlite3_finalize(stmt);
         } else {
@@ -247,12 +327,13 @@ bool MenuOrden::mostrarMenu() {
 
     while (continuar) {
         std::string menu = "\n--- Menú de Órdenes ---\n"
-                           "1. Mostrar órdenes anteriores\n"
-                           "2. Comprar\n"
-                           "3. Vender\n"
-                           "4. Volver al menú principal\n"
-                           "5. Cerrar conexión\n"
-                           "Seleccione una opción: ";
+                            "1. Mostrar órdenes anteriores\n"
+                            "2. Comprar\n"
+                            "3. Vender\n"
+        					"4. Cancelar orden\n"
+                            "5. Volver al menú principal\n"
+                            "6. Cerrar conexión\n"
+                            "Seleccione una opción: ";
         send(comm_socket, menu.c_str(), menu.size(), 0);
 
         int bytesRecibidos = recv(comm_socket, buffer, sizeof(buffer) - 1, 0);
@@ -271,9 +352,12 @@ bool MenuOrden::mostrarMenu() {
                 vender();
                 break;
             case 4:
-                continuar = false;
+                cancelarOrdenPendiente();
                 break;
             case 5:
+                continuar = false;
+                break;
+            case 6:
                 return false;
             default:
                 send(comm_socket, "Opción inválida\n", 16, 0);

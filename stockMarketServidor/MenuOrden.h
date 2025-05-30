@@ -16,6 +16,7 @@ private:
 public:
     MenuOrden(SOCKET comm_socket, const Usuario& usuario);
     bool mostrarMenu(); // Devuelve true si el usuario quiere salir completamente
+    void cancelarOrdenPendiente();
 };
 
 #endif

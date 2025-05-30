@@ -9,6 +9,57 @@
 #include <cstring>
 #include "sqlite3.h"
 
+bool actualizarSaldo(const std::string& email, double cantidad, bool sumar) {
+    sqlite3* db;
+    sqlite3_stmt* stmt;
+    int rc = sqlite3_open("JP.sqlite", &db);
+    if (rc) return false;
+
+    const char* sqlSelect = "SELECT Dinero FROM Usuario WHERE Email = ?";
+    rc = sqlite3_prepare_v2(db, sqlSelect, -1, &stmt, nullptr);
+    if (rc != SQLITE_OK) {
+        sqlite3_close(db);
+        return false;
+    }
+
+    sqlite3_bind_text(stmt, 1, email.c_str(), -1, SQLITE_STATIC);
+    rc = sqlite3_step(stmt);
+    double saldoActual = 0;
+    if (rc == SQLITE_ROW) {
+        saldoActual = sqlite3_column_double(stmt, 0);
+    } else {
+        sqlite3_finalize(stmt);
+        sqlite3_close(db);
+        return false;
+    }
+    sqlite3_finalize(stmt);
+
+    double nuevoSaldo = sumar ? saldoActual + cantidad : saldoActual - cantidad;
+    const char* sqlUpdate = "UPDATE Usuario SET Dinero = ? WHERE Email = ?";
+    rc = sqlite3_prepare_v2(db, sqlUpdate, -1, &stmt, nullptr);
+    if (rc != SQLITE_OK) {
+        sqlite3_close(db);
+        return false;
+    }
+
+    sqlite3_bind_double(stmt, 1, nuevoSaldo);
+    sqlite3_bind_text(stmt, 2, email.c_str(), -1, SQLITE_STATIC);
+    rc = sqlite3_step(stmt);
+
+    sqlite3_finalize(stmt);
+    sqlite3_close(db);
+    return rc == SQLITE_DONE;
+}
+
+bool restarDineroAlComprador(const std::string& email, double total) {
+    return actualizarSaldo(email, total, false);
+}
+
+bool sumarDineroAlVendedor(const std::string& email, double total) {
+    return actualizarSaldo(email, total, true);
+}
+
+
 MenuOrden::MenuOrden(SOCKET comm_socket, const Usuario& usuario)
     : comm_socket(comm_socket), usuario(usuario) {}
 
@@ -22,6 +73,25 @@ std::string obtenerFechaActual() {
     }
     return "";
 }
+
+std::string obtenerEmailPorIdOrden(int idOrden) {
+    sqlite3* db;
+    sqlite3_stmt* stmt;
+    std::string email = "";
+    if (sqlite3_open("JP.sqlite", &db) != SQLITE_OK) return email;
+
+    const char* sql = "SELECT Email FROM Orden WHERE ID_Orden = ?";
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) == SQLITE_OK) {
+        sqlite3_bind_int(stmt, 1, idOrden);
+        if (sqlite3_step(stmt) == SQLITE_ROW) {
+            email = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
+        }
+        sqlite3_finalize(stmt);
+    }
+    sqlite3_close(db);
+    return email;
+}
+
 
 void MenuOrden::mostrarOrdenesAnteriores() {
     sqlite3* db;
@@ -121,6 +191,11 @@ void MenuOrden::comprar() {
                     sqlite3_bind_int(stmt, 2, idVenta);
                     sqlite3_step(stmt);
                     sqlite3_finalize(stmt);
+
+                    // 💸 ACTUALIZACIÓN DE SALDOS
+                    restarDineroAlComprador(usuario.getEmail(), precio * cantidad);
+                    std::string emailVendedor = obtenerEmailPorIdOrden(idVenta);
+                    sumarDineroAlVendedor(emailVendedor, precio * cantidad);
                 }
             } else {
                 sqlite3_finalize(stmt);

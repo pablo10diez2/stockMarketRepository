@@ -547,3 +547,42 @@
 [2025-05-30 11:51:49] Inicio de sesión exitoso para el usuario: iker
 [2025-05-30 11:51:49] Usuario iker ha iniciado sesión.
 [2025-05-30 11:51:49] Usuario iker accedió al menú principal
+[2025-05-30 12:03:12] Servidor iniciado en 127.0.0.1:6000
+[2025-05-30 12:03:14] Nueva conexión desde: 127.0.0.1:2507
+[2025-05-30 12:03:19] Cliente seleccionó iniciar sesión
+[2025-05-30 12:03:22] Inicio de sesión exitoso para el usuario: pablo
+[2025-05-30 12:03:22] Usuario pablo ha iniciado sesión.
+[2025-05-30 12:03:22] Usuario pablo accedió al menú principal
+[2025-05-30 12:03:25] Usuario pablo accedió al menú de cuenta
+[2025-05-30 12:03:32] Usuario pablo consultó su perfil
+[2025-05-30 12:04:18] Cliente desconectado inesperadamente en el menú principal
+[2025-05-30 12:04:30] Nueva conexión desde: 127.0.0.1:2510
+[2025-05-30 12:04:37] Cliente seleccionó iniciar sesión
+[2025-05-30 12:04:39] Inicio de sesión exitoso para el usuario: pablo
+[2025-05-30 12:04:39] Usuario pablo ha iniciado sesión.
+[2025-05-30 12:04:39] Usuario pablo accedió al menú principal
+[2025-05-30 12:05:19] Usuario pablo accedió al menú de cuenta
+[2025-05-30 12:05:23] Usuario pablo consultó su perfil
+[2025-05-30 12:06:59] Usuario pablo accedió al menú de cuenta
+[2025-05-30 12:07:02] Usuario pablo consultó su perfil
+[2025-05-30 12:10:28] Servidor iniciado en 127.0.0.1:6000
+[2025-05-30 12:10:32] Nueva conexión desde: 127.0.0.1:2552
+[2025-05-30 12:10:38] Cliente seleccionó iniciar sesión
+[2025-05-30 12:10:43] Inicio de sesión exitoso para el usuario: pablo
+[2025-05-30 12:10:43] Usuario pablo ha iniciado sesión.
+[2025-05-30 12:10:43] Usuario pablo accedió al menú principal
+[2025-05-30 12:10:47] Usuario pablo accedió al menú de cuenta
+[2025-05-30 12:11:06] Usuario pablo consultó su perfil
+[2025-05-30 12:11:45] Usuario pablo accedió al menú de cuenta
+[2025-05-30 12:11:47] Usuario pablo consultó su perfil
+[2025-05-30 12:12:13] Nueva conexión desde: 127.0.0.1:2555
+[2025-05-30 12:12:17] Cliente seleccionó iniciar sesión
+[2025-05-30 12:12:33] Inicio de sesión exitoso para el usuario: iker
+[2025-05-30 12:12:34] Usuario iker ha iniciado sesión.
+[2025-05-30 12:12:34] Usuario iker accedió al menú principal
+[2025-05-30 12:12:38] Usuario iker accedió al menú de cuenta
+[2025-05-30 12:12:40] Usuario iker consultó su perfil
+[2025-05-30 12:14:08] Usuario iker accedió al menú de cuenta
+[2025-05-30 12:14:10] Usuario iker consultó su perfil
+[2025-05-30 12:14:57] Conexión perdida en menú principal con usuario: iker
+[2025-05-30 12:14:57] Cliente desconectado inesperadamente en el menú principal

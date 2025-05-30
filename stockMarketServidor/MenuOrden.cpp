@@ -29,7 +29,7 @@ std::string MenuOrden::obtenerEmailPorIdOrden(int idOrden) {
     sqlite3_stmt* stmt;
     std::string email;
 
-    const char* db_path = "JP.sqlite"; // Cambia esto si tu base tiene otro nombre o ruta
+    const char* db_path = "JP.sqlite";
 
     if (sqlite3_open(db_path, &db) != SQLITE_OK) {
         std::cerr << "Error al abrir la base de datos: " << sqlite3_errmsg(db) << "\n";
@@ -335,7 +335,7 @@ void MenuOrden::comprar() {
                     sqlite3_step(stmt);
                     sqlite3_finalize(stmt);
 
-                    // 💸 Transferencia de dinero
+
                     restarDineroAlComprador(usuario.getEmail(), total);
                     std::string emailVendedor = obtenerEmailPorIdOrden(idVenta);
                     sumarDineroAlVendedor(emailVendedor, total);
@@ -465,8 +465,8 @@ void MenuOrden::vender() {
             estado = 1;
             fechaEjecucion = fecha;
 
-            // 💰 Actualización de saldos
-            std::string emailComprador = obtenerEmailPorIdOrden(idCompra); // ← Debes tener esta función ya hecha
+
+            std::string emailComprador = obtenerEmailPorIdOrden(idCompra); //
             std::string emailVendedor = usuario.getEmail();
             double total = precio * cantidad;
 

@@ -70,7 +70,7 @@ bool registrarUsuario(const std::string& nombre, const std::string& apellido,
         return false;
     }
 
-    // Verificar si el email ya existe en la base de datos
+
     const char* sqlCheck = "SELECT COUNT(*) FROM Usuario WHERE Email = ?";
     rc = sqlite3_prepare_v2(db, sqlCheck, -1, &stmt, nullptr);
     if (rc != SQLITE_OK) {
@@ -91,7 +91,7 @@ bool registrarUsuario(const std::string& nombre, const std::string& apellido,
 
     sqlite3_finalize(stmt);
 
-    // Registrar el nuevo usuario
+
     const char* sqlInsert = "INSERT INTO Usuario (Nombre_Usuario, Apellido_Usuario, Email, Contrasena, ID_Rol, Dinero) "
                           "VALUES (?, ?, ?, ?, ?, 0)";
 
@@ -128,7 +128,7 @@ Usuario cargarUsuarioDesdeBD(const std::string& email) {
     sqlite3_stmt* stmt;
     int rc;
 
-    Usuario usuario; // Crear un usuario vacío por defecto
+    Usuario usuario;
 
     rc = sqlite3_open("JP.sqlite", &db);
     if (rc) {
@@ -157,7 +157,7 @@ Usuario cargarUsuarioDesdeBD(const std::string& email) {
         int id_rol = sqlite3_column_int(stmt, 4);
         double dinero = sqlite3_column_double(stmt, 5);
 
-        // Crear un nuevo objeto Usuario con todos los datos
+
         usuario = Usuario(nombre, apellido, dbEmail, password, id_rol, dinero);
         std::cout << "Usuario cargado: " << nombre << " " << apellido << " (Email: " << dbEmail << ")\n";
     } else {

@@ -13,9 +13,8 @@ private:
 	double dinero;
 
 public:
-	// Constructor vacío
+
 	Usuario();
-	// Constructor con parámetros
 	Usuario(const std::string& nombre, const std::string& apellido, const std::string& email,
 			const std::string& contrasena, int idRol, double dinero);
 	~Usuario();

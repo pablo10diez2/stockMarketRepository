@@ -154,7 +154,7 @@ void MenuCuenta::verPerfil() {
 
     std::string perfil = "\n=== PERFIL DE USUARIO ===\n";
 
-    // Obtener info básica
+
     const char* sqlUser = "SELECT Nombre_Usuario, Apellido_Usuario, Email, ID_Rol, Dinero FROM Usuario WHERE Email = ?";
     rc = sqlite3_prepare_v2(db, sqlUser, -1, &stmt, nullptr);
     if (rc != SQLITE_OK) {
@@ -173,7 +173,7 @@ void MenuCuenta::verPerfil() {
         double dineroTotal = sqlite3_column_double(stmt, 4);
         sqlite3_finalize(stmt);
 
-        // Calcular dinero retenido en órdenes de compra pendientes
+
         double retenido = 0.0;
         const char* sqlRetenido = "SELECT SUM(Precio * Cantidad) FROM Orden WHERE Email = ? AND TipoOrden = 'Compra' AND Estado = 0";
         if (sqlite3_prepare_v2(db, sqlRetenido, -1, &stmt, nullptr) == SQLITE_OK) {
@@ -199,7 +199,7 @@ void MenuCuenta::verPerfil() {
         return;
     }
 
-    // Mostrar acciones descontando las puestas en venta
+
     perfil += "\n=== ACCIONES EN POSESIÓN ===\n";
     const char* sqlAcciones = R"(
         SELECT T1.Ticker,
@@ -259,7 +259,7 @@ void MenuCuenta::cambiarContrasena() {
     std::string msg = "Introduzca la nueva contraseña: ";
     std::cout << "Enviando: " << msg;
     send(comm_socket, msg.c_str(), msg.size(), 0);
-    Sleep(100); // Asegurar que el mensaje llegue
+    Sleep(100);
 
     std::cout << "Esperando nueva contraseña del cliente..." << std::endl;
     bytes = recv(comm_socket, recvBuff, sizeof(recvBuff) - 1, 0);
@@ -269,7 +269,7 @@ void MenuCuenta::cambiarContrasena() {
     }
     recvBuff[bytes] = '\0';
     std::string nuevaContrasena(recvBuff);
-    // Limpiar caracteres de nueva línea y retorno de carro
+
     nuevaContrasena.erase(std::remove(nuevaContrasena.begin(), nuevaContrasena.end(), '\r'), nuevaContrasena.end());
     nuevaContrasena.erase(std::remove(nuevaContrasena.begin(), nuevaContrasena.end(), '\n'), nuevaContrasena.end());
 
@@ -307,7 +307,7 @@ void MenuCuenta::cambiarContrasena() {
         std::string exito = "Contraseña actualizada correctamente.\n";
         std::cout << "Enviando: " << exito;
         send(comm_socket, exito.c_str(), exito.size(), 0);
-        Sleep(100); // Asegurar que el mensaje llegue
+        Sleep(100);
 
         try {
             escribirLog("Usuario " + email_usuario + " cambió su contraseña");
@@ -333,7 +333,7 @@ void MenuCuenta::introducirFondos() {
     std::string msg = "Introduce tu número de cuenta: ";
     std::cout << "Enviando: " << msg;
     send(comm_socket, msg.c_str(), msg.size(), 0);
-    Sleep(100); // Asegurar que el mensaje llegue
+    Sleep(100);
 
     std::cout << "Esperando número de cuenta del cliente..." << std::endl;
     bytes = recv(comm_socket, recvBuff, sizeof(recvBuff) - 1, 0);
@@ -351,7 +351,7 @@ void MenuCuenta::introducirFondos() {
     msg = "Introduce la cantidad de fondos a añadir: ";
     std::cout << "Enviando: " << msg;
     send(comm_socket, msg.c_str(), msg.size(), 0);
-    Sleep(100); // Asegurar que el mensaje llegue
+    Sleep(100);
 
     std::cout << "Esperando cantidad de fondos del cliente..." << std::endl;
     bytes = recv(comm_socket, recvBuff, sizeof(recvBuff) - 1, 0);
@@ -366,7 +366,7 @@ void MenuCuenta::introducirFondos() {
 
     std::cout << "Cantidad de fondos recibida: " << cantidadStr << std::endl;
 
-    // Convertir a número y validar
+
     double cantidad = 0;
     try {
         cantidad = std::stod(cantidadStr);
@@ -395,7 +395,6 @@ void MenuCuenta::introducirFondos() {
         return;
     }
 
-    // Primero, obtener el dinero actual
     const char* sqlSelect = "SELECT Dinero FROM Usuario WHERE Email = ?";
     rc = sqlite3_prepare_v2(db, sqlSelect, -1, &stmt, nullptr);
     if (rc != SQLITE_OK) {
@@ -424,7 +423,7 @@ void MenuCuenta::introducirFondos() {
 
     sqlite3_finalize(stmt);
 
-    // Actualizar con el nuevo saldo
+
     double nuevoSaldo = dineroActual + cantidad;
     const char* sqlUpdate = "UPDATE Usuario SET Dinero = ? WHERE Email = ?";
 
@@ -448,8 +447,7 @@ void MenuCuenta::introducirFondos() {
                                 std::to_string(nuevoSaldo) + " €\n";
         std::cout << "Enviando: " << confirmacion;
         send(comm_socket, confirmacion.c_str(), confirmacion.size(), 0);
-        Sleep(100); // Asegurar que el mensaje llegue
-
+        Sleep(100);
         try {
             escribirLog("Usuario " + email_usuario + " añadió " + std::to_string(cantidad) + " € a su cuenta");
         } catch (const std::exception& e) {

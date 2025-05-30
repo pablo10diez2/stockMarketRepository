@@ -7,13 +7,13 @@ class Orden {
 private:
     int id;
     std::string fechaCreacion;
-    std::string fechaEjecucion; // Vacía si no está ejecutada
-    int estado; // 0 = pendiente, 1 = ejecutada
+    std::string fechaEjecucion;
+    int estado;
     double precio;
     int cantidad;
     std::string email;
     std::string ticker;
-    std::string tipoOrden; // "Compra" o "Venta"
+    std::string tipoOrden;
 
 public:
     Orden(int id, const std::string& fechaCreacion, double precio, int cantidad,

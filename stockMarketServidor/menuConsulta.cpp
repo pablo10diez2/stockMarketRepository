@@ -5,16 +5,15 @@
 #include <sstream>
 #include <vector>
 #include <string>
-#include <algorithm>  // for remove
+#include <algorithm>
 #include <winsock2.h>
 
-// Función que carga acciones desde fichero
 std::vector<Accion> cargarAccionesDesdeFichero(const std::string& ruta) {
     std::vector<Accion> acciones;
     std::ifstream fichero(ruta);
 
     if (!fichero.is_open()) {
-        // No hacer send aquí: solo devolver vector vacío
+
         return acciones;
     }
 
@@ -34,7 +33,6 @@ std::vector<Accion> cargarAccionesDesdeFichero(const std::string& ruta) {
     return acciones;
 }
 
-// Función auxiliar para recibir línea del cliente por socket
 std::string recibirLinea(SOCKET comm_socket) {
     char buffer[512];
     int bytes = recv(comm_socket, buffer, sizeof(buffer) - 1, 0);
@@ -43,13 +41,13 @@ std::string recibirLinea(SOCKET comm_socket) {
     buffer[bytes] = '\0';
     std::string linea(buffer);
 
-    // Limpiar posibles '\r' y '\n'
+
     linea.erase(std::remove(linea.begin(), linea.end(), '\r'), linea.end());
     linea.erase(std::remove(linea.begin(), linea.end(), '\n'), linea.end());
     return linea;
 }
 
-// Función para enviar texto al cliente (sin chequeo de errores para simplificar)
+
 void enviarTexto(SOCKET comm_socket, const std::string& texto) {
     send(comm_socket, texto.c_str(), texto.size(), 0);
 }

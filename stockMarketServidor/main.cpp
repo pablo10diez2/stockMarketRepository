@@ -112,7 +112,7 @@ int main() {
                         send(comm_socket, successMsg.c_str(), successMsg.size(), 0);
                         escribirLog("Inicio de sesión exitoso para el usuario: " + email);
 
-                        // Cargar los datos completos del usuario desde la BD
+
                         Usuario usuario = cargarUsuarioDesdeBD(email);
                         if (usuario.getEmail().empty()) {
                             escribirLog("Error al cargar datos de usuario: " + email);

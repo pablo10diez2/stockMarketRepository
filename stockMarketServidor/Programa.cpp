@@ -2,7 +2,7 @@
 #define PROGRAMA_CPP_
 
 #include "Programa.h"
-#include <algorithm>  // For std::remove
+#include <algorithm>
 #include <iostream>
 #include <string>
 #include <winsock2.h>
@@ -17,7 +17,7 @@ bool mostrarMenuPrincipal(SOCKET comm_socket, Usuario usuario) {
     int bytes;
     bool sesionActiva = true;
 
-    // Registro para depuración
+
     std::cout << "Entrando en mostrarMenuPrincipal para usuario: " << usuario.getEmail() << std::endl;
     try {
         escribirLog("Usuario " + usuario.getEmail() + " accedió al menú principal");
@@ -28,7 +28,7 @@ bool mostrarMenuPrincipal(SOCKET comm_socket, Usuario usuario) {
     while (sesionActiva) {
         std::string subMenu = "\n=== MENU PRINCIPAL ===\n1) Consulta\n2) Orden\n3) Cuenta\n4) Salir\nSeleccione una opción: ";
 
-        // Display menu on server console too
+
         std::cout << "\nMostrando al cliente:\n" << subMenu << std::endl;
 
         int sendResult = send(comm_socket, subMenu.c_str(), subMenu.size(), 0);
@@ -51,7 +51,7 @@ bool mostrarMenuPrincipal(SOCKET comm_socket, Usuario usuario) {
 
         recvBuff[bytes] = '\0';
         std::string subOption(recvBuff);
-        // Eliminar caracteres de nueva línea y retorno de carro
+
         subOption.erase(std::remove(subOption.begin(), subOption.end(), '\r'), subOption.end());
         subOption.erase(std::remove(subOption.begin(), subOption.end(), '\n'), subOption.end());
 
@@ -89,7 +89,7 @@ bool mostrarMenuPrincipal(SOCKET comm_socket, Usuario usuario) {
             std::cout << "Enviando: " << msg;
             send(comm_socket, msg.c_str(), msg.size(), 0);
 
-            // Pequeña pausa para asegurar que el mensaje se recibe
+
             Sleep(100);
 
             try {

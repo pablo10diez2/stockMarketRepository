@@ -11,7 +11,7 @@ private:
    void vender();
 public:
    MenuOrden(SOCKET comm_socket, const Usuario& usuario);
-   bool mostrarMenu(); // Devuelve true si el usuario quiere salir completamente
+   bool mostrarMenu();
    void cancelarOrdenPendiente();
    void restarDineroAlComprador(const std::string& email, double cantidad);
    void sumarDineroAlVendedor(const std::string& email, double cantidad);

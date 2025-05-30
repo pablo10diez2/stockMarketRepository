@@ -13,5 +13,9 @@ public:
    MenuOrden(SOCKET comm_socket, const Usuario& usuario);
    bool mostrarMenu(); // Devuelve true si el usuario quiere salir completamente
    void cancelarOrdenPendiente();
+   void restarDineroAlComprador(const std::string& email, double cantidad);
+   void sumarDineroAlVendedor(const std::string& email, double cantidad);
+   std::string obtenerEmailPorIdOrden(int idOrden);
+
 };
 #endif

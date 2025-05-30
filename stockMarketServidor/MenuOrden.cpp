@@ -8,6 +8,7 @@
 #include <string>
 #include <cstring>
 #include "sqlite3.h"
+#include <tuple>
 
 MenuOrden::MenuOrden(SOCKET comm_socket, const Usuario& usuario)
    : comm_socket(comm_socket), usuario(usuario) {}
@@ -23,6 +24,78 @@ std::string obtenerFechaActual() {
    return "";
 }
 
+std::string MenuOrden::obtenerEmailPorIdOrden(int idOrden) {
+    sqlite3* db;
+    sqlite3_stmt* stmt;
+    std::string email;
+
+    const char* db_path = "JP.sqlite"; // Cambia esto si tu base tiene otro nombre o ruta
+
+    if (sqlite3_open(db_path, &db) != SQLITE_OK) {
+        std::cerr << "Error al abrir la base de datos: " << sqlite3_errmsg(db) << "\n";
+        return "";
+    }
+
+    const char* query = R"(
+        SELECT Email
+        FROM Orden
+        WHERE ID_Orden = ?
+    )";
+
+    if (sqlite3_prepare_v2(db, query, -1, &stmt, nullptr) == SQLITE_OK) {
+        sqlite3_bind_int(stmt, 1, idOrden);
+
+        int result = sqlite3_step(stmt);
+        if (result == SQLITE_ROW) {
+            const unsigned char* emailText = sqlite3_column_text(stmt, 0);
+            if (emailText) {
+                email = reinterpret_cast<const char*>(emailText);
+            }
+        } else if (result == SQLITE_DONE) {
+            std::cerr << "No se encontró la orden con ID " << idOrden << ".\n";
+        } else {
+            std::cerr << "Error al ejecutar la consulta: " << sqlite3_errmsg(db) << "\n";
+        }
+    } else {
+        std::cerr << "Error al preparar la consulta: " << sqlite3_errmsg(db) << "\n";
+    }
+
+    sqlite3_finalize(stmt);
+    sqlite3_close(db);
+    return email;
+}
+
+void MenuOrden::restarDineroAlComprador(const std::string& email, double cantidad) {
+    sqlite3* db;
+    sqlite3_stmt* stmt;
+    if (sqlite3_open("JP.sqlite", &db) == SQLITE_OK) {
+        const char* sql = "UPDATE Usuario SET Dinero = Dinero - ? WHERE Email = ?";
+        if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) == SQLITE_OK) {
+            sqlite3_bind_double(stmt, 1, cantidad);
+            sqlite3_bind_text(stmt, 2, email.c_str(), -1, SQLITE_STATIC);
+            sqlite3_step(stmt);
+            sqlite3_finalize(stmt);
+            std::cout<< cantidad<<email.c_str() <<std::endl;
+        }
+        sqlite3_close(db);
+    }
+}
+
+void MenuOrden::sumarDineroAlVendedor(const std::string& email, double cantidad) {
+    sqlite3* db;
+    sqlite3_stmt* stmt;
+    if (sqlite3_open("JP.sqlite", &db) == SQLITE_OK) {
+        const char* sql = "UPDATE Usuario SET Dinero = Dinero + ? WHERE Email = ?";
+        if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) == SQLITE_OK) {
+            sqlite3_bind_double(stmt, 1, cantidad);
+            sqlite3_bind_text(stmt, 2, email.c_str(), -1, SQLITE_STATIC);
+            sqlite3_step(stmt);
+            sqlite3_finalize(stmt);
+            std::cout<< cantidad<<email.c_str() <<std::endl;
+        }
+        sqlite3_close(db);
+    }
+}
 double calcularDineroRetenido(const std::string& email) {
     sqlite3* db;
     sqlite3_stmt* stmt;
@@ -108,16 +181,25 @@ void MenuOrden::cancelarOrdenPendiente() {
         sqlite3_close(db);
         return;
     }
+    double totalCompra = 0.0;
+    double totalVenta = 0.0;
 
-    for (auto& [id, tipo, precio, cantidad] : ordenesDetalles) {
-        if (id == idIngresado) {
-            if (tipo == "Compra") {
-                double total = precio * cantidad;
-                restarDineroAlComprador(usuario.getEmail(), -total);  // esto suma de nuevo
-            }
-            break;
+    for (auto& orden : ordenesDetalles) {
+        int id = std::get<0>(orden);
+        std::string tipo = std::get<1>(orden);
+        double precio = std::get<2>(orden);
+        int cantidad = std::get<3>(orden);
+
+        std::cout << "ID: " << id << ", Tipo: " << tipo
+                  << ", Precio: " << precio << ", Cantidad: " << cantidad << std::endl;
+
+        if (tipo == "Compra") {
+            totalCompra += precio * cantidad;
+        } else if (tipo == "Venta") {
+            totalVenta += precio * cantidad;
         }
     }
+
 
     std::string deleteSQL = "DELETE FROM Orden WHERE ID_Orden = ?";
     rc = sqlite3_prepare_v2(db, deleteSQL.c_str(), -1, &stmt, nullptr);
@@ -324,7 +406,6 @@ void MenuOrden::vender() {
     sqlite3_stmt* stmt;
     if (sqlite3_open("JP.sqlite", &db) != SQLITE_OK) return;
 
-
     const char* sqlCheck = R"(
         SELECT 
             SUM(CASE 
@@ -383,6 +464,14 @@ void MenuOrden::vender() {
 
             estado = 1;
             fechaEjecucion = fecha;
+
+            // 💰 Actualización de saldos
+            std::string emailComprador = obtenerEmailPorIdOrden(idCompra); // ← Debes tener esta función ya hecha
+            std::string emailVendedor = usuario.getEmail();
+            double total = precio * cantidad;
+
+            restarDineroAlComprador(emailComprador, total);
+            sumarDineroAlVendedor(emailVendedor, total);
         }
         sqlite3_finalize(stmt);
     }
@@ -402,9 +491,9 @@ void MenuOrden::vender() {
             sqlite3_bind_null(stmt, 7);
 
         if (sqlite3_step(stmt) == SQLITE_DONE) {
-            int id = static_cast<int>(sqlite3_last_insert_rowid(db));
+            int idVenta = static_cast<int>(sqlite3_last_insert_rowid(db));
             std::string msg = "Orden de venta " + std::string((estado == 1) ? "ejecutada" : "pendiente") +
-                              " con ID " + std::to_string(id) + "\n";
+                              " con ID " + std::to_string(idVenta) + "\n";
             send(comm_socket, msg.c_str(), msg.size(), 0);
         } else {
             send(comm_socket, "Error al insertar orden de venta.\n", 34, 0);
@@ -415,6 +504,7 @@ void MenuOrden::vender() {
 
     sqlite3_close(db);
 }
+
 
 bool MenuOrden::mostrarMenu() {
    char buffer[256];

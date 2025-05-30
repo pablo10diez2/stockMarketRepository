@@ -271,10 +271,11 @@ bool MenuOrden::mostrarMenu() {
                 vender();
                 break;
             case 4:
-                continuar = false;
-                break;
+            	return false;
             case 5:
-                return false;
+            	send(comm_socket, "Cerrando sesión. Hasta luego.\n", 31, 0);
+            	continuar = false;
+            	break;
             default:
                 send(comm_socket, "Opción inválida\n", 16, 0);
                 break;

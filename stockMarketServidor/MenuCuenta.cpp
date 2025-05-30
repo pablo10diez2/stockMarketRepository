@@ -4,7 +4,8 @@
 #include <iostream>
 #include <string>
 #include <winsock2.h>
-#include <algorithm>  // Para std::remove
+#include <algorithm>
+#include <sstream>
 
 MenuCuenta::MenuCuenta(SOCKET socket, const std::string& email) : comm_socket(socket), email_usuario(email) {
     std::cout << "MenuCuenta creado para usuario: " << email << std::endl;
@@ -16,8 +17,6 @@ bool MenuCuenta::mostrarMenu() {
     bool menuActivo = true;
     bool salirCompleto = false;
 
-    std::cout << "Entrando en MenuCuenta::mostrarMenu() para usuario: " << email_usuario << std::endl;
-
     try {
         escribirLog("Usuario " + email_usuario + " accedió al menú de cuenta");
     } catch (const std::exception& e) {
@@ -25,99 +24,121 @@ bool MenuCuenta::mostrarMenu() {
     }
 
     while (menuActivo) {
-    	std::string menuOpciones = "\n=== MENU CUENTA ===\n1) Ver perfil\n2) Cambiar contrasena\n3) Introducir fondos\n4) Ver acciones\n5) Volver\n6) Salir\nSeleccione una opción: ";
-
-        // Display menu on server console as well
-        std::cout << "\nMostrando al cliente el menú de cuenta:\n" << menuOpciones << std::endl;
-
-        int sendResult = send(comm_socket, menuOpciones.c_str(), menuOpciones.size(), 0);
-        if (sendResult == SOCKET_ERROR) {
-            std::cout << "Error al enviar menú cuenta: " << WSAGetLastError() << std::endl;
-            return true; // Salir completamente en caso de error
-        }
-
-        // Asegurar que el mensaje llegue antes de esperar respuesta
+        std::string menuOpciones = "\n=== MENU CUENTA ===\n1) Ver perfil\n2) Cambiar contrasena\n3) Introducir fondos\n4) Ver acciones\n5) Balance\n6) Volver\n7) Salir\nSeleccione una opción: ";
+        send(comm_socket, menuOpciones.c_str(), menuOpciones.size(), 0);
         Sleep(100);
 
-        std::cout << "Esperando respuesta del cliente en MenuCuenta..." << std::endl;
         bytes = recv(comm_socket, recvBuff, sizeof(recvBuff) - 1, 0);
-
-        if (bytes <= 0) {
-            std::cout << "El cliente se desconectó durante el menú de cuenta. Error: " << WSAGetLastError() << std::endl;
-            return true; // Salir completamente si hay desconexión
-        }
-
+        if (bytes <= 0) return true;
         recvBuff[bytes] = '\0';
         std::string opcion(recvBuff);
-        // Limpiar caracteres de nueva línea y retorno de carro
         opcion.erase(std::remove(opcion.begin(), opcion.end(), '\r'), opcion.end());
         opcion.erase(std::remove(opcion.begin(), opcion.end(), '\n'), opcion.end());
 
-        std::cout << "Opción recibida en menú cuenta: '" << opcion << "'" << std::endl;
-
         if (opcion == "1") {
-            std::cout << "Usuario seleccionó: Ver perfil" << std::endl;
-            // Enviar esta información al cliente también
-            std::string msg = "Opción seleccionada: Ver perfil\n";
-            send(comm_socket, msg.c_str(), msg.size(), 0);
-            Sleep(100); // Asegurar que el mensaje llegue
-
             verPerfil();
-
-            // No necesitamos volver a mostrar el menú aquí, ya que el bucle while se encargará de eso
         } else if (opcion == "2") {
-            std::cout << "Usuario seleccionó: Cambiar contraseña" << std::endl;
-            // Enviar esta información al cliente también
-            std::string msg = "Opción seleccionada: Cambiar contraseña\n";
-            send(comm_socket, msg.c_str(), msg.size(), 0);
-            Sleep(100); // Asegurar que el mensaje llegue
-
             cambiarContrasena();
-
-            // No necesitamos volver a mostrar el menú aquí, ya que el bucle while se encargará de eso
         } else if (opcion == "3") {
-            std::cout << "Usuario seleccionó: Introducir fondos" << std::endl;
-            // Enviar esta información al cliente también
-            std::string msg = "Opción seleccionada: Introducir fondos\n";
-            send(comm_socket, msg.c_str(), msg.size(), 0);
-            Sleep(100); // Asegurar que el mensaje llegue
-
             introducirFondos();
-        }else if (opcion == "4") {
-            std::cout << "Usuario seleccionó: Ver acciones" << std::endl;
-            std::string msg = "Opción seleccionada: Ver acciones\n";
+        } else if (opcion == "4") {
+            mostrarAccionesUsuario();
+        } else if (opcion == "5") {
+            mostrarBalance();
+        } else if (opcion == "6") {
+            std::string msg = "Volviendo al menú principal...\n";
             send(comm_socket, msg.c_str(), msg.size(), 0);
             Sleep(100);
-            mostrarAccionesUsuario();
-
-            // No necesitamos volver a mostrar el menú aquí, ya que el bucle while se encargará de eso
-        } else if (opcion == "5") {
-            std::cout << "Usuario seleccionó: Volver al menú principal" << std::endl;
-            std::string msg = "Volviendo al menú principal...\n";
-            std::cout << "Enviando: " << msg;
-            send(comm_socket, msg.c_str(), msg.size(), 0);
-            Sleep(100); // Asegurar que el mensaje llegue
             menuActivo = false;
-        } else if (opcion == "6") {
-            std::cout << "Usuario seleccionó: Salir del sistema" << std::endl;
+        } else if (opcion == "7") {
             std::string msg = "Saliendo del sistema. ¡Hasta pronto!\n";
-            std::cout << "Enviando: " << msg;
             send(comm_socket, msg.c_str(), msg.size(), 0);
-            Sleep(100); // Asegurar que el mensaje llegue
+            Sleep(100);
             menuActivo = false;
             salirCompleto = true;
         } else {
-            std::cout << "Usuario introdujo opción inválida: " << opcion << std::endl;
             std::string msg = "Opción inválida. Intente de nuevo.\n";
-            std::cout << "Enviando: " << msg;
             send(comm_socket, msg.c_str(), msg.size(), 0);
-            Sleep(100); // Asegurar que el mensaje llegue
+            Sleep(100);
         }
     }
-
-    std::cout << "Saliendo de MenuCuenta::mostrarMenu()" << std::endl;
     return salirCompleto;
 }
+
+void MenuCuenta::mostrarBalance() {
+    sqlite3* db;
+    sqlite3_stmt* stmt;
+    int rc;
+    double ventas = 0.0, compras = 0.0, retenido = 0.0, saldoTotal = 0.0;
+
+    rc = sqlite3_open("JP.sqlite", &db);
+    if (rc) {
+        std::string errorMsg = "Error al conectar con la base de datos.\n";
+        send(comm_socket, errorMsg.c_str(), errorMsg.size(), 0);
+        return;
+    }
+
+    const char* sqlVentas = "SELECT SUM(Precio * Cantidad) FROM Orden WHERE Email = ? AND TipoOrden = 'Venta' AND Estado = 1";
+    rc = sqlite3_prepare_v2(db, sqlVentas, -1, &stmt, nullptr);
+    if (rc == SQLITE_OK) {
+        sqlite3_bind_text(stmt, 1, email_usuario.c_str(), -1, SQLITE_STATIC);
+        if (sqlite3_step(stmt) == SQLITE_ROW && sqlite3_column_type(stmt, 0) != SQLITE_NULL) {
+            ventas = sqlite3_column_double(stmt, 0);
+        }
+        sqlite3_finalize(stmt);
+    }
+
+    const char* sqlCompras = "SELECT SUM(Precio * Cantidad) FROM Orden WHERE Email = ? AND TipoOrden = 'Compra' AND Estado = 1";
+    rc = sqlite3_prepare_v2(db, sqlCompras, -1, &stmt, nullptr);
+    if (rc == SQLITE_OK) {
+        sqlite3_bind_text(stmt, 1, email_usuario.c_str(), -1, SQLITE_STATIC);
+        if (sqlite3_step(stmt) == SQLITE_ROW && sqlite3_column_type(stmt, 0) != SQLITE_NULL) {
+            compras = sqlite3_column_double(stmt, 0);
+        }
+        sqlite3_finalize(stmt);
+    }
+
+    const char* sqlRetenido = "SELECT SUM(Precio * Cantidad) FROM Orden WHERE Email = ? AND TipoOrden = 'Compra' AND Estado = 0";
+    rc = sqlite3_prepare_v2(db, sqlRetenido, -1, &stmt, nullptr);
+    if (rc == SQLITE_OK) {
+        sqlite3_bind_text(stmt, 1, email_usuario.c_str(), -1, SQLITE_STATIC);
+        if (sqlite3_step(stmt) == SQLITE_ROW && sqlite3_column_type(stmt, 0) != SQLITE_NULL) {
+            retenido = sqlite3_column_double(stmt, 0);
+        }
+        sqlite3_finalize(stmt);
+    }
+
+    const char* sqlDinero = "SELECT Dinero FROM Usuario WHERE Email = ?";
+    rc = sqlite3_prepare_v2(db, sqlDinero, -1, &stmt, nullptr);
+    if (rc == SQLITE_OK) {
+        sqlite3_bind_text(stmt, 1, email_usuario.c_str(), -1, SQLITE_STATIC);
+        if (sqlite3_step(stmt) == SQLITE_ROW) {
+            saldoTotal = sqlite3_column_double(stmt, 0);
+        }
+        sqlite3_finalize(stmt);
+    }
+
+    sqlite3_close(db);
+
+    double disponible = saldoTotal - retenido;
+    double balance = ventas - compras;
+
+    std::ostringstream resumen;
+    resumen << "\n- Ingresos (Entradas de dinero): \n";
+    resumen << "Ventas realizadas: " << ventas << "€ \n";
+    resumen << "\n- Gastos (Salidas de dinero): \n";
+    resumen << "Compras realizadas: " << compras << "€ \n";
+    resumen << "\n- Resumen del balance: \n";
+    resumen << "Saldo disponible: " << disponible << "€ \n";
+    resumen << "Saldo retenido: " << retenido << "€ \n";
+    resumen << "Saldo total: " << saldoTotal << "€ \n";
+    resumen << "Balance total: " << balance << "€ \n";
+
+    std::string textoFinal = resumen.str();
+    send(comm_socket, textoFinal.c_str(), textoFinal.size(), 0);
+    Sleep(100);
+}
+
 
 void MenuCuenta::verPerfil() {
     std::cout << "Ejecutando verPerfil() para usuario: " << email_usuario << std::endl;

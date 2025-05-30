@@ -10,13 +10,13 @@ private:
     std::string fechaEjecucion; // Vacía si no está ejecutada
     int estado; // 0 = pendiente, 1 = ejecutada
     double precio;
-    double cantidad;
+    int cantidad;
     std::string email;
     std::string ticker;
     std::string tipoOrden; // "Compra" o "Venta"
 
 public:
-    Orden(int id, const std::string& fechaCreacion, double precio, double cantidad,
+    Orden(int id, const std::string& fechaCreacion, double precio, int cantidad,
           const std::string& email, const std::string& ticker, const std::string& tipoOrden);
 
     int getId() const;
@@ -24,7 +24,7 @@ public:
     std::string getFechaEjecucion() const;
     int getEstado() const;
     double getPrecio() const;
-    double getCantidad() const;
+    int getCantidad() const;
     std::string getEmail() const;
     std::string getTicker() const;
     std::string getTipoOrden() const;

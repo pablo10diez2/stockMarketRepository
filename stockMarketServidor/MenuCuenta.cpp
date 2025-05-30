@@ -441,7 +441,7 @@ void MenuCuenta::mostrarAccionesUsuario() {
 
     while ((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
         const char* ticker = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
-        double cantidad = sqlite3_column_double(stmt, 1);
+        int cantidad = sqlite3_column_double(stmt, 1);
         resumen += "Ticker: " + std::string(ticker) + " | Cantidad: " + std::to_string(cantidad) + "\n";
         tieneAcciones = true;
     }

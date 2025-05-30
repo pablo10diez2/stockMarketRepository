@@ -41,7 +41,7 @@ void MenuOrden::mostrarOrdenesAnteriores() {
                 int id = sqlite3_column_int(stmt, 0);
                 std::string tipo = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
                 std::string ticker = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 2));
-                double cantidad = sqlite3_column_double(stmt, 3);
+                int cantidad = sqlite3_column_int(stmt, 3);
                 double precio = sqlite3_column_double(stmt, 4);
                 int estado = sqlite3_column_int(stmt, 5);
                 std::string fechaCreacion = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 6));
@@ -70,12 +70,11 @@ void MenuOrden::mostrarOrdenesAnteriores() {
     send(comm_socket, resumen.c_str(), resumen.size(), 0);
 }
 
-
-
 void MenuOrden::comprar() {
     char buffer[256];
     std::string ticker;
-    double precio, cantidad;
+    double precio;
+    int cantidad;
 
     send(comm_socket, "Ingrese el ticker: ", 20, 0);
     int recvLen = recv(comm_socket, buffer, sizeof(buffer) - 1, 0);
@@ -88,7 +87,7 @@ void MenuOrden::comprar() {
     recvLen = recv(comm_socket, buffer, sizeof(buffer) - 1, 0);
     if (recvLen <= 0) return;
     buffer[recvLen] = '\0';
-    cantidad = std::stod(buffer);
+    cantidad = std::stoi(buffer);
 
     send(comm_socket, "Ingrese el precio: ", 20, 0);
     recvLen = recv(comm_socket, buffer, sizeof(buffer) - 1, 0);
@@ -102,14 +101,13 @@ void MenuOrden::comprar() {
 
     if (sqlite3_open("JP.sqlite", &db) == SQLITE_OK) {
         std::string fechaEjecucion = "";
-        int estado = 0; // 0 = Pendiente, 1 = Ejecutada
+        int estado = 0;
 
-        // Buscar orden venta compatible para ejecución inmediata
-        std::string query = "SELECT ID_Orden FROM Orden WHERE TipoOrden = 'Venta' AND Ticker = ? AND Precio <= ? AND Cantidad >= ? AND Estado = 0 LIMIT 1";
+        std::string query = "SELECT ID_Orden FROM Orden WHERE TipoOrden = 'Venta' AND Ticker = ? AND Precio <= ? AND Cantidad = ? AND Estado = 0 ORDER BY Fecha_Creacion ASC LIMIT 1";
         if (sqlite3_prepare_v2(db, query.c_str(), -1, &stmt, nullptr) == SQLITE_OK) {
             sqlite3_bind_text(stmt, 1, ticker.c_str(), -1, SQLITE_STATIC);
             sqlite3_bind_double(stmt, 2, precio);
-            sqlite3_bind_double(stmt, 3, cantidad);
+            sqlite3_bind_int(stmt, 3, cantidad);
 
             if (sqlite3_step(stmt) == SQLITE_ROW) {
                 int idVenta = sqlite3_column_int(stmt, 0);
@@ -117,7 +115,6 @@ void MenuOrden::comprar() {
                 fechaEjecucion = fecha;
                 sqlite3_finalize(stmt);
 
-                // Actualizar orden venta como ejecutada
                 std::string update = "UPDATE Orden SET Estado = 1, Fecha_Ejecucion = ? WHERE ID_Orden = ?";
                 if (sqlite3_prepare_v2(db, update.c_str(), -1, &stmt, nullptr) == SQLITE_OK) {
                     sqlite3_bind_text(stmt, 1, fecha.c_str(), -1, SQLITE_STATIC);
@@ -130,13 +127,11 @@ void MenuOrden::comprar() {
             }
         }
 
-        // Insertar orden compra
-        std::string insert = "INSERT INTO Orden (Fecha_Creacion, Precio, Cantidad, Email, Ticker, TipoOrden, Estado, Fecha_Ejecucion) "
-                             "VALUES (?, ?, ?, ?, ?, 'Compra', ?, ?)";
+        std::string insert = "INSERT INTO Orden (Fecha_Creacion, Precio, Cantidad, Email, Ticker, TipoOrden, Estado, Fecha_Ejecucion) VALUES (?, ?, ?, ?, ?, 'Compra', ?, ?)";
         if (sqlite3_prepare_v2(db, insert.c_str(), -1, &stmt, nullptr) == SQLITE_OK) {
             sqlite3_bind_text(stmt, 1, fecha.c_str(), -1, SQLITE_STATIC);
             sqlite3_bind_double(stmt, 2, precio);
-            sqlite3_bind_double(stmt, 3, cantidad);
+            sqlite3_bind_int(stmt, 3, cantidad);
             sqlite3_bind_text(stmt, 4, usuario.getEmail().c_str(), -1, SQLITE_STATIC);
             sqlite3_bind_text(stmt, 5, ticker.c_str(), -1, SQLITE_STATIC);
             sqlite3_bind_int(stmt, 6, estado);
@@ -162,7 +157,8 @@ void MenuOrden::comprar() {
 void MenuOrden::vender() {
     char buffer[256];
     std::string ticker;
-    double precio, cantidad;
+    double precio;
+    int cantidad;
 
     send(comm_socket, "Ingrese el ticker: ", 20, 0);
     int recvLen = recv(comm_socket, buffer, sizeof(buffer) - 1, 0);
@@ -175,7 +171,7 @@ void MenuOrden::vender() {
     recvLen = recv(comm_socket, buffer, sizeof(buffer) - 1, 0);
     if (recvLen <= 0) return;
     buffer[recvLen] = '\0';
-    cantidad = std::stod(buffer);
+    cantidad = std::stoi(buffer);
 
     send(comm_socket, "Ingrese el precio: ", 20, 0);
     recvLen = recv(comm_socket, buffer, sizeof(buffer) - 1, 0);
@@ -187,65 +183,63 @@ void MenuOrden::vender() {
     sqlite3* db;
     sqlite3_stmt* stmt;
 
-    if (sqlite3_open("JP.sqlite", &db) == SQLITE_OK) {
-        std::string fechaEjecucion = "";
-        int estado = 0;
+    if (sqlite3_open("JP.sqlite", &db) != SQLITE_OK) return;
 
-        // Buscar orden compra compatible para ejecución inmediata
-        std::string query = "SELECT ID_Orden FROM Orden WHERE TipoOrden = 'Compra' AND Ticker = ? AND Precio >= ? AND Cantidad >= ? AND Estado = 0 LIMIT 1";
-        if (sqlite3_prepare_v2(db, query.c_str(), -1, &stmt, nullptr) == SQLITE_OK) {
-            sqlite3_bind_text(stmt, 1, ticker.c_str(), -1, SQLITE_STATIC);
-            sqlite3_bind_double(stmt, 2, precio);
-            sqlite3_bind_double(stmt, 3, cantidad);
+    int estado = 0;
+    std::string fechaEjecucion = "";
 
-            if (sqlite3_step(stmt) == SQLITE_ROW) {
-                int idCompra = sqlite3_column_int(stmt, 0);
-                estado = 1;
-                fechaEjecucion = fecha;
-                sqlite3_finalize(stmt);
+    std::string query = "SELECT ID_Orden FROM Orden WHERE TipoOrden = 'Compra' AND Ticker = ? AND Precio >= ? AND Cantidad = ? AND Estado = 0 ORDER BY Fecha_Creacion ASC LIMIT 1";
+    if (sqlite3_prepare_v2(db, query.c_str(), -1, &stmt, nullptr) == SQLITE_OK) {
+        sqlite3_bind_text(stmt, 1, ticker.c_str(), -1, SQLITE_STATIC);
+        sqlite3_bind_double(stmt, 2, precio);
+        sqlite3_bind_int(stmt, 3, cantidad);
 
-                // Actualizar orden compra como ejecutada
-                std::string update = "UPDATE Orden SET Estado = 1, Fecha_Ejecucion = ? WHERE ID_Orden = ?";
-                if (sqlite3_prepare_v2(db, update.c_str(), -1, &stmt, nullptr) == SQLITE_OK) {
-                    sqlite3_bind_text(stmt, 1, fecha.c_str(), -1, SQLITE_STATIC);
-                    sqlite3_bind_int(stmt, 2, idCompra);
-                    sqlite3_step(stmt);
-                    sqlite3_finalize(stmt);
-                }
-            } else {
-                sqlite3_finalize(stmt);
+        if (sqlite3_step(stmt) == SQLITE_ROW) {
+            int idCompra = sqlite3_column_int(stmt, 0);
+
+            std::string updateCompra = "UPDATE Orden SET Estado = 1, Fecha_Ejecucion = ? WHERE ID_Orden = ?";
+            sqlite3_stmt* updateStmt;
+            if (sqlite3_prepare_v2(db, updateCompra.c_str(), -1, &updateStmt, nullptr) == SQLITE_OK) {
+                sqlite3_bind_text(updateStmt, 1, fecha.c_str(), -1, SQLITE_STATIC);
+                sqlite3_bind_int(updateStmt, 2, idCompra);
+                sqlite3_step(updateStmt);
+                sqlite3_finalize(updateStmt);
             }
+
+            estado = 1;
+            fechaEjecucion = fecha;
         }
-
-        // Insertar orden venta
-        std::string insert = "INSERT INTO Orden (Fecha_Creacion, Precio, Cantidad, Email, Ticker, TipoOrden, Estado, Fecha_Ejecucion) "
-                             "VALUES (?, ?, ?, ?, ?, 'Venta', ?, ?)";
-        if (sqlite3_prepare_v2(db, insert.c_str(), -1, &stmt, nullptr) == SQLITE_OK) {
-            sqlite3_bind_text(stmt, 1, fecha.c_str(), -1, SQLITE_STATIC);
-            sqlite3_bind_double(stmt, 2, precio);
-            sqlite3_bind_double(stmt, 3, cantidad);
-            sqlite3_bind_text(stmt, 4, usuario.getEmail().c_str(), -1, SQLITE_STATIC);
-            sqlite3_bind_text(stmt, 5, ticker.c_str(), -1, SQLITE_STATIC);
-            sqlite3_bind_int(stmt, 6, estado);
-            if (estado == 1)
-                sqlite3_bind_text(stmt, 7, fecha.c_str(), -1, SQLITE_STATIC);
-            else
-                sqlite3_bind_null(stmt, 7);
-
-            if (sqlite3_step(stmt) == SQLITE_DONE) {
-                int id = static_cast<int>(sqlite3_last_insert_rowid(db));
-                std::string msg = "Orden de venta creada con ID " + std::to_string(id) + "\n";
-                send(comm_socket, msg.c_str(), msg.size(), 0);
-            } else {
-                send(comm_socket, "Error al insertar orden\n", 24, 0);
-            }
-            sqlite3_finalize(stmt);
-        }
-
-        sqlite3_close(db);
+        sqlite3_finalize(stmt);
     }
-}
 
+    std::string insert = "INSERT INTO Orden (Fecha_Creacion, Precio, Cantidad, Email, Ticker, TipoOrden, Estado, Fecha_Ejecucion) VALUES (?, ?, ?, ?, ?, 'Venta', ?, ?)";
+    if (sqlite3_prepare_v2(db, insert.c_str(), -1, &stmt, nullptr) == SQLITE_OK) {
+        sqlite3_bind_text(stmt, 1, fecha.c_str(), -1, SQLITE_STATIC);
+        sqlite3_bind_double(stmt, 2, precio);
+        sqlite3_bind_int(stmt, 3, cantidad);
+        sqlite3_bind_text(stmt, 4, usuario.getEmail().c_str(), -1, SQLITE_STATIC);
+        sqlite3_bind_text(stmt, 5, ticker.c_str(), -1, SQLITE_STATIC);
+        sqlite3_bind_int(stmt, 6, estado);
+
+        if (estado == 1)
+            sqlite3_bind_text(stmt, 7, fecha.c_str(), -1, SQLITE_STATIC);
+        else
+            sqlite3_bind_null(stmt, 7);
+
+        if (sqlite3_step(stmt) == SQLITE_DONE) {
+            int id = static_cast<int>(sqlite3_last_insert_rowid(db));
+            std::string msg = "Orden de venta " + std::string((estado == 1) ? "ejecutada" : "pendiente") +
+                              " con ID " + std::to_string(id) + "\n";
+            send(comm_socket, msg.c_str(), msg.size(), 0);
+        } else {
+            send(comm_socket, "Error al insertar orden de venta.\n", 34, 0);
+        }
+
+        sqlite3_finalize(stmt);
+    }
+
+    sqlite3_close(db);
+}
 
 bool MenuOrden::mostrarMenu() {
     char buffer[256];
@@ -277,11 +271,9 @@ bool MenuOrden::mostrarMenu() {
                 vender();
                 break;
             case 4:
-                // volver al menú principal
                 continuar = false;
                 break;
             case 5:
-                // cerrar la conexión
                 return false;
             default:
                 send(comm_socket, "Opción inválida\n", 16, 0);
@@ -290,4 +282,3 @@ bool MenuOrden::mostrarMenu() {
     }
     return true;
 }
-

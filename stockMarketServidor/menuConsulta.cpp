@@ -66,8 +66,7 @@ void mostrarMenuConsulta(SOCKET comm_socket) {
         std::string menu = "\n--- MENU CONSULTA ---\n"
                            "1) Consultar nombre acción (por ticker)\n"
                            "2) Consultar ticker acción (por nombre)\n"
-                           "3) Vender (pendiente)\n"
-                           "0) Volver al menú principal\n"
+                           "3) Volver al menú principal\n"
                            "Selecciona opción: ";
         enviarTexto(comm_socket, menu);
 
@@ -118,10 +117,8 @@ void mostrarMenuConsulta(SOCKET comm_socket) {
             }
 
         } else if (opcion == "3") {
-            enviarTexto(comm_socket, "Función vender pendiente de implementar...\n");
+        	salir = true;
 
-        } else if (opcion == "0") {
-            salir = true;
         } else {
             enviarTexto(comm_socket, "Opción inválida. Intenta de nuevo.\n");
         }

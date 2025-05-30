@@ -145,68 +145,110 @@ void MenuCuenta::verPerfil() {
 
     sqlite3* db;
     sqlite3_stmt* stmt;
-    int rc;
-
-    rc = sqlite3_open("JP.sqlite", &db);
+    int rc = sqlite3_open("JP.sqlite", &db);
     if (rc) {
         std::string errorMsg = "Error al conectar con la base de datos.\n";
-        std::cout << "Error de SQLite: " << sqlite3_errmsg(db) << std::endl;
         send(comm_socket, errorMsg.c_str(), errorMsg.size(), 0);
         return;
     }
 
-    const char* sql = "SELECT Nombre_Usuario, Apellido_Usuario, Email, ID_Rol, Dinero "
-                    "FROM Usuario WHERE Email = ?";
+    std::string perfil = "\n=== PERFIL DE USUARIO ===\n";
 
-    rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
+    // Obtener info básica
+    const char* sqlUser = "SELECT Nombre_Usuario, Apellido_Usuario, Email, ID_Rol, Dinero FROM Usuario WHERE Email = ?";
+    rc = sqlite3_prepare_v2(db, sqlUser, -1, &stmt, nullptr);
     if (rc != SQLITE_OK) {
-        std::string errorMsg = "Error al preparar la consulta.\n";
-        std::cout << "Error de SQLite: " << sqlite3_errmsg(db) << std::endl;
+        std::string errorMsg = "Error al preparar la consulta de usuario.\n";
         send(comm_socket, errorMsg.c_str(), errorMsg.size(), 0);
         sqlite3_close(db);
         return;
     }
 
     sqlite3_bind_text(stmt, 1, email_usuario.c_str(), -1, SQLITE_STATIC);
-    rc = sqlite3_step(stmt);
-
-    if (rc == SQLITE_ROW) {
+    if (sqlite3_step(stmt) == SQLITE_ROW) {
         std::string nombre = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
         std::string apellido = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
         std::string email = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 2));
         int rol = sqlite3_column_int(stmt, 3);
-        double dinero = sqlite3_column_double(stmt, 4);
+        double dineroTotal = sqlite3_column_double(stmt, 4);
+        sqlite3_finalize(stmt);
 
-        std::string rolTexto = (rol == 1) ? "Administrador" : "Usuario";
+        // Calcular dinero retenido en órdenes de compra pendientes
+        double retenido = 0.0;
+        const char* sqlRetenido = "SELECT SUM(Precio * Cantidad) FROM Orden WHERE Email = ? AND TipoOrden = 'Compra' AND Estado = 0";
+        if (sqlite3_prepare_v2(db, sqlRetenido, -1, &stmt, nullptr) == SQLITE_OK) {
+            sqlite3_bind_text(stmt, 1, email_usuario.c_str(), -1, SQLITE_STATIC);
+            if (sqlite3_step(stmt) == SQLITE_ROW && sqlite3_column_type(stmt, 0) != SQLITE_NULL) {
+                retenido = sqlite3_column_double(stmt, 0);
+            }
+            sqlite3_finalize(stmt);
+        }
 
-        std::string perfil = "\n=== PERFIL DE USUARIO ===\n";
+        double disponible = dineroTotal - retenido;
+
         perfil += "Nombre: " + nombre + "\n";
         perfil += "Apellido: " + apellido + "\n";
         perfil += "Email: " + email + "\n";
-        perfil += "Rol: " + rolTexto + "\n";
-        perfil += "Dinero disponible: " + std::to_string(dinero) + " €\n";
-
-        // Display what's being sent to the client
-        std::cout << "Enviando información de perfil al cliente:\n" << perfil << std::endl;
-
-        send(comm_socket, perfil.c_str(), perfil.size(), 0);
-        // Asegurar que el mensaje llegue
-        Sleep(100);
-
-        try {
-            escribirLog("Usuario " + email_usuario + " consultó su perfil");
-        } catch (const std::exception& e) {
-            std::cout << "Error al escribir log: " << e.what() << std::endl;
-        }
+        perfil += "Rol: " + std::string((rol == 1) ? "Administrador" : "Usuario") + "\n";
+        perfil += "Saldo disponible: " + std::to_string(disponible) + " €\n";
+        perfil += "Saldo retenido: " + std::to_string(retenido) + " €\n";
     } else {
         std::string errorMsg = "No se encontró información del usuario.\n";
-        std::cout << "No se encontró el usuario en la base de datos" << std::endl;
         send(comm_socket, errorMsg.c_str(), errorMsg.size(), 0);
+        sqlite3_close(db);
+        return;
     }
 
-    sqlite3_finalize(stmt);
+    // Mostrar acciones descontando las puestas en venta
+    perfil += "\n=== ACCIONES EN POSESIÓN ===\n";
+    const char* sqlAcciones = R"(
+        SELECT T1.Ticker,
+               IFNULL(T1.Total - IFNULL(T2.EnVenta, 0), 0) AS Disponibles
+        FROM (
+            SELECT Ticker, SUM(CASE WHEN TipoOrden = 'Compra' THEN Cantidad ELSE -Cantidad END) AS Total
+            FROM Orden
+            WHERE Email = ? AND Estado = 1
+            GROUP BY Ticker
+        ) AS T1
+        LEFT JOIN (
+            SELECT Ticker, SUM(Cantidad) AS EnVenta
+            FROM Orden
+            WHERE Email = ? AND TipoOrden = 'Venta' AND Estado = 0
+            GROUP BY Ticker
+        ) AS T2
+        ON T1.Ticker = T2.Ticker
+        WHERE Disponibles > 0
+    )";
+
+    if (sqlite3_prepare_v2(db, sqlAcciones, -1, &stmt, nullptr) == SQLITE_OK) {
+        sqlite3_bind_text(stmt, 1, email_usuario.c_str(), -1, SQLITE_STATIC);
+        sqlite3_bind_text(stmt, 2, email_usuario.c_str(), -1, SQLITE_STATIC);
+        bool tieneAcciones = false;
+        while ((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
+            std::string ticker = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
+            int cantidad = sqlite3_column_int(stmt, 1);
+            perfil += "Ticker: " + ticker + " | Cantidad: " + std::to_string(cantidad) + "\n";
+            tieneAcciones = true;
+        }
+        if (!tieneAcciones) {
+            perfil += "No tienes acciones disponibles.\n";
+        }
+        sqlite3_finalize(stmt);
+    } else {
+        perfil += "Error al consultar las acciones.\n";
+    }
+
     sqlite3_close(db);
+    send(comm_socket, perfil.c_str(), perfil.size(), 0);
+    Sleep(100);
+
+    try {
+        escribirLog("Usuario " + email_usuario + " consultó su perfil");
+    } catch (const std::exception& e) {
+        std::cout << "Error al escribir log: " << e.what() << std::endl;
+    }
 }
+
 
 void MenuCuenta::cambiarContrasena() {
     std::cout << "Ejecutando cambiarContrasena() para usuario: " << email_usuario << std::endl;

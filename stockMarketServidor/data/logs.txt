@@ -461,6 +461,7 @@
 [2025-05-30 08:48:46] Usuario pablo ha iniciado sesión.
 [2025-05-30 08:48:46] Usuario pablo accedió al menú principal
 [2025-05-30 08:49:18] Usuario pablo cerró sesión
+<<<<<<< HEAD
 [2025-05-30 10:26:37] Servidor iniciado en 127.0.0.1:6000
 [2025-05-30 10:27:45] Servidor iniciado en 127.0.0.1:6000
 [2025-05-30 10:27:50] Nueva conexión desde: 127.0.0.1:52512
@@ -489,3 +490,159 @@
 [2025-05-30 10:32:05] Usuario pablo ha iniciado sesión.
 [2025-05-30 10:32:05] Usuario pablo accedió al menú principal
 [2025-05-30 10:32:27] Cliente desconectado inesperadamente en el menú principal
+=======
+[2025-05-30 11:26:15] Servidor iniciado en 127.0.0.1:6000
+[2025-05-30 11:26:18] Nueva conexión desde: 127.0.0.1:2279
+[2025-05-30 11:26:26] Cliente seleccionó iniciar sesión
+[2025-05-30 11:26:30] Inicio de sesión exitoso para el usuario: pablo
+[2025-05-30 11:26:30] Usuario pablo ha iniciado sesión.
+[2025-05-30 11:26:30] Usuario pablo accedió al menú principal
+[2025-05-30 11:30:27] Servidor iniciado en 127.0.0.1:6000
+[2025-05-30 11:30:31] Nueva conexión desde: 127.0.0.1:2310
+[2025-05-30 11:30:40] Servidor iniciado en 127.0.0.1:6000
+[2025-05-30 11:31:09] Servidor iniciado en 127.0.0.1:6000
+[2025-05-30 11:31:11] Nueva conexión desde: 127.0.0.1:2323
+[2025-05-30 11:31:17] Cliente seleccionó iniciar sesión
+[2025-05-30 11:31:21] Inicio de sesión exitoso para el usuario: pablo
+[2025-05-30 11:31:21] Usuario pablo ha iniciado sesión.
+[2025-05-30 11:31:21] Usuario pablo accedió al menú principal
+[2025-05-30 11:31:26] Usuario pablo accedió al menú de cuenta
+[2025-05-30 11:35:31] Servidor iniciado en 127.0.0.1:6000
+[2025-05-30 11:35:34] Nueva conexión desde: 127.0.0.1:2328
+[2025-05-30 11:35:38] Cliente seleccionó iniciar sesión
+[2025-05-30 11:35:41] Inicio de sesión exitoso para el usuario: iker
+[2025-05-30 11:35:41] Usuario iker ha iniciado sesión.
+[2025-05-30 11:35:41] Usuario iker accedió al menú principal
+[2025-05-30 11:36:01] Usuario iker cerró sesión
+[2025-05-30 11:36:54] Nueva conexión desde: 127.0.0.1:2330
+[2025-05-30 11:37:02] Servidor iniciado en 127.0.0.1:6000
+[2025-05-30 11:38:13] Servidor iniciado en 127.0.0.1:6000
+[2025-05-30 11:38:18] Nueva conexión desde: 127.0.0.1:2387
+[2025-05-30 11:38:21] Cliente seleccionó iniciar sesión
+[2025-05-30 11:38:24] Inicio de sesión exitoso para el usuario: iker
+[2025-05-30 11:38:24] Usuario iker ha iniciado sesión.
+[2025-05-30 11:38:24] Usuario iker accedió al menú principal
+[2025-05-30 11:38:50] Servidor iniciado en 127.0.0.1:6000
+[2025-05-30 11:38:52] Nueva conexión desde: 127.0.0.1:2390
+[2025-05-30 11:39:08] Servidor iniciado en 127.0.0.1:6000
+[2025-05-30 11:39:11] Nueva conexión desde: 127.0.0.1:2391
+[2025-05-30 11:39:26] Cliente desconectado inesperadamente en el menú principal
+[2025-05-30 11:39:37] Servidor iniciado en 127.0.0.1:6000
+[2025-05-30 11:39:41] Nueva conexión desde: 127.0.0.1:2393
+[2025-05-30 11:39:48] Servidor iniciado en 127.0.0.1:6000
+[2025-05-30 11:42:21] Servidor iniciado en 127.0.0.1:6000
+[2025-05-30 11:42:23] Nueva conexión desde: 127.0.0.1:2402
+[2025-05-30 11:42:25] Cliente seleccionó iniciar sesión
+[2025-05-30 11:42:28] Inicio de sesión exitoso para el usuario: iker
+[2025-05-30 11:42:28] Usuario iker ha iniciado sesión.
+[2025-05-30 11:42:28] Usuario iker accedió al menú principal
+[2025-05-30 11:43:18] Servidor iniciado en 127.0.0.1:6000
+[2025-05-30 11:43:23] Servidor iniciado en 127.0.0.1:6000
+[2025-05-30 11:43:44] Servidor iniciado en 127.0.0.1:6000
+[2025-05-30 11:43:47] Nueva conexión desde: 127.0.0.1:2406
+[2025-05-30 11:43:52] Cliente seleccionó iniciar sesión
+[2025-05-30 11:43:55] Inicio de sesión exitoso para el usuario: iker
+[2025-05-30 11:43:55] Usuario iker ha iniciado sesión.
+[2025-05-30 11:43:55] Usuario iker accedió al menú principal
+[2025-05-30 11:44:16] Usuario iker cerró sesión
+[2025-05-30 11:44:22] Servidor iniciado en 127.0.0.1:6000
+[2025-05-30 11:44:26] Nueva conexión desde: 127.0.0.1:2409
+[2025-05-30 11:44:41] Servidor iniciado en 127.0.0.1:6000
+[2025-05-30 11:45:02] Servidor iniciado en 127.0.0.1:6000
+[2025-05-30 11:45:05] Nueva conexión desde: 127.0.0.1:2410
+[2025-05-30 11:45:08] Cliente seleccionó iniciar sesión
+[2025-05-30 11:45:10] Inicio de sesión exitoso para el usuario: iker
+[2025-05-30 11:45:10] Usuario iker ha iniciado sesión.
+[2025-05-30 11:45:10] Usuario iker accedió al menú principal
+[2025-05-30 11:47:05] Servidor iniciado en 127.0.0.1:6000
+[2025-05-30 11:47:09] Nueva conexión desde: 127.0.0.1:2415
+[2025-05-30 11:47:14] Cliente seleccionó iniciar sesión
+[2025-05-30 11:47:17] Inicio de sesión exitoso para el usuario: iker
+[2025-05-30 11:47:17] Usuario iker ha iniciado sesión.
+[2025-05-30 11:47:17] Usuario iker accedió al menú principal
+[2025-05-30 11:47:58] Nueva conexión desde: 127.0.0.1:2437
+[2025-05-30 11:48:09] Cliente seleccionó iniciar sesión
+[2025-05-30 11:48:13] Cliente desconectado durante el inicio de sesión
+[2025-05-30 11:50:37] Servidor iniciado en 127.0.0.1:6000
+[2025-05-30 11:50:40] Nueva conexión desde: 127.0.0.1:2444
+[2025-05-30 11:50:54] Cliente seleccionó iniciar sesión
+[2025-05-30 11:50:56] Inicio de sesión exitoso para el usuario: iker
+[2025-05-30 11:50:56] Usuario iker ha iniciado sesión.
+[2025-05-30 11:50:56] Usuario iker accedió al menú principal
+[2025-05-30 11:51:31] Conexión perdida en menú principal con usuario: iker
+[2025-05-30 11:51:31] Cliente desconectado inesperadamente en el menú principal
+[2025-05-30 11:51:39] Servidor iniciado en 127.0.0.1:6000
+[2025-05-30 11:51:41] Nueva conexión desde: 127.0.0.1:2446
+[2025-05-30 11:51:47] Cliente seleccionó iniciar sesión
+[2025-05-30 11:51:49] Inicio de sesión exitoso para el usuario: iker
+[2025-05-30 11:51:49] Usuario iker ha iniciado sesión.
+[2025-05-30 11:51:49] Usuario iker accedió al menú principal
+[2025-05-30 12:03:12] Servidor iniciado en 127.0.0.1:6000
+[2025-05-30 12:03:14] Nueva conexión desde: 127.0.0.1:2507
+[2025-05-30 12:03:19] Cliente seleccionó iniciar sesión
+[2025-05-30 12:03:22] Inicio de sesión exitoso para el usuario: pablo
+[2025-05-30 12:03:22] Usuario pablo ha iniciado sesión.
+[2025-05-30 12:03:22] Usuario pablo accedió al menú principal
+[2025-05-30 12:03:25] Usuario pablo accedió al menú de cuenta
+[2025-05-30 12:03:32] Usuario pablo consultó su perfil
+[2025-05-30 12:04:18] Cliente desconectado inesperadamente en el menú principal
+[2025-05-30 12:04:30] Nueva conexión desde: 127.0.0.1:2510
+[2025-05-30 12:04:37] Cliente seleccionó iniciar sesión
+[2025-05-30 12:04:39] Inicio de sesión exitoso para el usuario: pablo
+[2025-05-30 12:04:39] Usuario pablo ha iniciado sesión.
+[2025-05-30 12:04:39] Usuario pablo accedió al menú principal
+[2025-05-30 12:05:19] Usuario pablo accedió al menú de cuenta
+[2025-05-30 12:05:23] Usuario pablo consultó su perfil
+[2025-05-30 12:06:59] Usuario pablo accedió al menú de cuenta
+[2025-05-30 12:07:02] Usuario pablo consultó su perfil
+[2025-05-30 12:10:28] Servidor iniciado en 127.0.0.1:6000
+[2025-05-30 12:10:32] Nueva conexión desde: 127.0.0.1:2552
+[2025-05-30 12:10:38] Cliente seleccionó iniciar sesión
+[2025-05-30 12:10:43] Inicio de sesión exitoso para el usuario: pablo
+[2025-05-30 12:10:43] Usuario pablo ha iniciado sesión.
+[2025-05-30 12:10:43] Usuario pablo accedió al menú principal
+[2025-05-30 12:10:47] Usuario pablo accedió al menú de cuenta
+[2025-05-30 12:11:06] Usuario pablo consultó su perfil
+[2025-05-30 12:11:45] Usuario pablo accedió al menú de cuenta
+[2025-05-30 12:11:47] Usuario pablo consultó su perfil
+[2025-05-30 12:12:13] Nueva conexión desde: 127.0.0.1:2555
+[2025-05-30 12:12:17] Cliente seleccionó iniciar sesión
+[2025-05-30 12:12:33] Inicio de sesión exitoso para el usuario: iker
+[2025-05-30 12:12:34] Usuario iker ha iniciado sesión.
+[2025-05-30 12:12:34] Usuario iker accedió al menú principal
+[2025-05-30 12:12:38] Usuario iker accedió al menú de cuenta
+[2025-05-30 12:12:40] Usuario iker consultó su perfil
+[2025-05-30 12:14:08] Usuario iker accedió al menú de cuenta
+[2025-05-30 12:14:10] Usuario iker consultó su perfil
+[2025-05-30 12:14:57] Conexión perdida en menú principal con usuario: iker
+[2025-05-30 12:14:57] Cliente desconectado inesperadamente en el menú principal
+[2025-05-30 13:00:18] Servidor iniciado en 127.0.0.1:6000
+[2025-05-30 13:00:19] Nueva conexión desde: 127.0.0.1:55543
+[2025-05-30 13:00:22] Cliente seleccionó iniciar sesión
+[2025-05-30 13:00:27] Inicio de sesión exitoso para el usuario: pablo
+[2025-05-30 13:00:27] Usuario pablo ha iniciado sesión.
+[2025-05-30 13:00:27] Usuario pablo accedió al menú principal
+[2025-05-30 13:00:44] Usuario pablo accedió al menú de cuenta
+[2025-05-30 13:21:36] Servidor iniciado en 127.0.0.1:6000
+[2025-05-30 13:21:39] Nueva conexión desde: 127.0.0.1:56011
+[2025-05-30 13:21:42] Cliente seleccionó iniciar sesión
+[2025-05-30 13:21:45] Inicio de sesión exitoso para el usuario: pablo
+[2025-05-30 13:21:45] Usuario pablo ha iniciado sesión.
+[2025-05-30 13:21:45] Usuario pablo accedió al menú principal
+[2025-05-30 13:21:53] Usuario pablo accedió al menú de cuenta
+[2025-05-30 13:24:38] Servidor iniciado en 127.0.0.1:6000
+[2025-05-30 13:24:39] Nueva conexión desde: 127.0.0.1:56046
+[2025-05-30 13:24:41] Cliente seleccionó iniciar sesión
+[2025-05-30 13:24:45] Inicio de sesión exitoso para el usuario: pablo
+[2025-05-30 13:24:45] Usuario pablo ha iniciado sesión.
+[2025-05-30 13:24:45] Usuario pablo accedió al menú principal
+[2025-05-30 13:24:53] Usuario pablo accedió al menú de cuenta
+[2025-05-30 13:26:03] Servidor iniciado en 127.0.0.1:6000
+[2025-05-30 13:26:04] Nueva conexión desde: 127.0.0.1:56076
+[2025-05-30 13:26:06] Cliente seleccionó iniciar sesión
+[2025-05-30 13:26:09] Inicio de sesión exitoso para el usuario: pablo
+[2025-05-30 13:26:09] Usuario pablo ha iniciado sesión.
+[2025-05-30 13:26:09] Usuario pablo accedió al menú principal
+[2025-05-30 13:26:14] Usuario pablo accedió al menú de cuenta
+[2025-05-30 13:27:37] Usuario pablo accedió al menú de cuenta
+>>>>>>> branch 'main' of https://github.com/pablo10diez2/stockMarketRepository.git
